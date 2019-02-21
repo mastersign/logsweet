@@ -1,0 +1,276 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Module logsweet.core &mdash; logsweet 0.0.0-dev documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Module logsweet.mock" href="mock.html" />
+    <link rel="prev" title="Welcome to logsweet’s documentation!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> logsweet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Module <code class="docutils literal notranslate"><span class="pre">logsweet.core</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="mock.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.mock</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="net.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.net</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="watch.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.watch</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">logsweet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Module <code class="docutils literal notranslate"><span class="pre">logsweet.core</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/modules/core.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-logsweet.core">
+<span id="module-logsweet-core"></span><h1>Module <code class="docutils literal notranslate"><span class="pre">logsweet.core</span></code><a class="headerlink" href="#module-logsweet.core" title="Permalink to this headline">¶</a></h1>
+<p>This module contains the core functionality.</p>
+<dl class="function">
+<dt id="logsweet.core.broadcast_lines">
+<code class="descclassname">logsweet.core.</code><code class="descname">broadcast_lines</code><span class="sig-paren">(</span><em>bind_address: str</em>, <em>file_glob: str</em>, <em>all_lines: bool = False</em>, <em>tail_lines: int = 0</em>, <em>encoding: Optional[str] = None</em>, <em>name: str = 'unknown'</em>, <em>silent: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/core.html#broadcast_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.core.broadcast_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start following text files, broadcasting newlines via an ZeroMQ PUB socket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>file_glob</strong> (<em>str</em>) – A path to the text file to tail.</li>
+<li><strong>bind_address</strong> (<em>str</em>) – The address to bind the socket to.</li>
+<li><strong>all_lines</strong> (<em>bool</em>) – A flag to indicate if already existing content
+of the file should be broadcasted.</li>
+<li><strong>tail_lines</strong> (<em>int</em>) – Indicates a number of trailing lines to broadcast before
+following new lines.</li>
+<li><strong>name</strong> (<em>str</em>) – The name of this broadcaster.</li>
+<li><strong>silent</strong> (<em>bool</em>) – If <cite>False</cite>, new lines are printed to the console.</li>
+<li><strong>encoding</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Specifies the encoding for reading the text files.
+If <cite>None</cite> defaults to preferred encoding of current user.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="logsweet.core.listen_to_lines">
+<code class="descclassname">logsweet.core.</code><code class="descname">listen_to_lines</code><span class="sig-paren">(</span><em>addresses: Sequence[str], interval: float = 0.1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/core.html#listen_to_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.core.listen_to_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subscribes to a number of ZeroMQ PUB sockets
+and prints the received lines.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>addresses</strong> (<em>Sequence</em><em>[</em><em>str</em><em>]</em>) – An iterable with multiple addresses;
+each in the format of <code class="docutils literal notranslate"><span class="pre">&lt;ip&gt;:&lt;port&gt;</span></code>.</li>
+<li><strong>interval</strong> (<em>float</em>) – The timeout in seconds when waiting for new messages
+before handling possible interruption.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="logsweet.core.write_logfiles">
+<code class="descclassname">logsweet.core.</code><code class="descname">write_logfiles</code><span class="sig-paren">(</span><em>logfiles: Sequence[str], interval: float = 0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/core.html#write_logfiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.core.write_logfiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes random entries into one or multiple logfiles.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>logfiles</strong> (<em>Sequence</em><em>[</em><em>str</em><em>]</em>) – An iterable with filenames to logfiles.</li>
+<li><strong>interval</strong> (<em>float</em>) – The interval for entry generation in seconds.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="mock.html" class="btn btn-neutral float-right" title="Module logsweet.mock" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to logsweet’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Tobias Kiertscher
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

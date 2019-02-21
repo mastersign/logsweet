@@ -1,0 +1,285 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Module logsweet.watch &mdash; logsweet 0.0.0-dev documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Module logsweet.net" href="net.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> logsweet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="core.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.core</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="mock.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.mock</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="net.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.net</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Module <code class="docutils literal notranslate"><span class="pre">logsweet.watch</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">logsweet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Module <code class="docutils literal notranslate"><span class="pre">logsweet.watch</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/modules/watch.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-logsweet.watch">
+<span id="module-logsweet-watch"></span><h1>Module <code class="docutils literal notranslate"><span class="pre">logsweet.watch</span></code><a class="headerlink" href="#module-logsweet.watch" title="Permalink to this headline">¶</a></h1>
+<p>Real-time text file watcher supporting log rotation.</p>
+<div class="line-block">
+<div class="line">Based on: Log Watcher Python Recipe</div>
+<div class="line">From: Giampaolo Rodolà</div>
+<div class="line">Licensed under: MIT</div>
+<div class="line">Source: ActiveState Code Recipe <a class="reference external" href="https://github.com/ActiveState/code/tree/master/recipes/Python/577968_Log_watcher_tail_F_log/">577968</a></div>
+</div>
+<dl class="class">
+<dt id="logsweet.watch.LogWatcher">
+<em class="property">class </em><code class="descclassname">logsweet.watch.</code><code class="descname">LogWatcher</code><span class="sig-paren">(</span><em>file_glob: str, handler: Union[Callable[[str, Sequence[str]], None], Any], watch_cb: Optional[Callable[str, None]] = None, unwatch_cb: Optional[Callable[str, None]] = None, all_lines: bool = False, tail_lines: int = 0, chunk_size: int = 1048576, encoding: Optional[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/watch.html#LogWatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.watch.LogWatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks for changes in all files matching a glob pattern.
+This is useful for watching log file changes in real-time.
+It also supports files rotation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>file_glob</strong> (<em>str</em>) – A Unix shell style globbing pattern for the files to watch.</li>
+<li><strong>handler</strong> (<em>Union</em><em>[</em><em>Callable</em><em>[</em><em>[</em><em>str</em><em>, </em><em>Sequence</em><em>[</em><em>str</em><em>]</em><em>]</em><em>, </em><em>None</em><em>]</em><em>, </em><em>Any</em><em>]</em>) – <p>A function which is called every time one of the files being
+watched is updated;
+this is called with <cite>filename</cite> and <cite>lines</cite> arguments.</p>
+<p>Alternatively an object with a method <code class="docutils literal notranslate"><span class="pre">notify_lines(filename,</span> <span class="pre">lines)</span></code>
+and optionally the methods <code class="docutils literal notranslate"><span class="pre">notify_watch(filename)</span></code> and
+<code class="docutils literal notranslate"><span class="pre">notify_unwatch(filename)</span></code>.</p>
+</li>
+<li><strong>watch_cb</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>[</em><em>[</em><em>str</em><em>]</em><em>, </em><em>None</em><em>]</em><em>]</em>) – A function which is called every time a file has joined the
+set of watched files;
+this is called with a <cite>filename</cite> argument.</li>
+<li><strong>unwatch_cb</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>[</em><em>[</em><em>str</em><em>]</em><em>, </em><em>None</em><em>]</em><em>]</em>) – A function which is called every time a file has left the
+set of watched files;
+this is called with a <cite>filename</cite> argument.</li>
+<li><strong>all_lines</strong> (<em>bool</em>) – Read all existing lines before starting to watch new lines.
+Ignores <cite>tail_lines</cite>.</li>
+<li><strong>tail_lines</strong> (<em>int</em>) – Read last N lines from files being watched before starting.</li>
+<li><strong>chunk_size</strong> (<em>int</em>) – An approximation of the maximum number of bytes to read from
+a file on every ieration (as opposed to load the entire
+file in memory until EOF is reached).
+Is passed to <code class="docutils literal notranslate"><span class="pre">file.readlines()</span></code>.
+Defaults to 1MB.</li>
+<li><strong>encoding</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The name of a character encoding to decode the text files.
+If <cite>None</cite> defaults to <code class="docutils literal notranslate"><span class="pre">locale.getpreferredencoding()</span></code>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">lines</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+
+<span class="n">lw</span> <span class="o">=</span> <span class="n">LogWatcher</span><span class="p">(</span><span class="s2">&quot;/var/log/*.log&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span>
+<span class="n">lw</span><span class="o">.</span><span class="n">watch</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="logsweet.watch.LogWatcher.watch">
+<code class="descname">watch</code><span class="sig-paren">(</span><em>interval: float = 0.1</em>, <em>blocking: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/watch.html#LogWatcher.watch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.watch.LogWatcher.watch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts watching for new lines in matching files
+and for new or removed matching files.</p>
+<p>Currently this is implemented with a busy loop.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>interval</strong> (<em>float</em>) – The polling interval in seconds.</li>
+<li><strong>blocking</strong> (<em>bool</em>) – If <cite>True</cite> is given, performs only one loop and then returns.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="net.html" class="btn btn-neutral float-left" title="Module logsweet.net" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Tobias Kiertscher
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
