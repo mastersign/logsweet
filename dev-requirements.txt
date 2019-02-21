@@ -1,0 +1,4 @@
+flake8
+sphinx
+sphinx-click
+sphinx_rtd_theme

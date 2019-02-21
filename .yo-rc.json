@@ -1,0 +1,16 @@
+{
+  "generator-mastersign-python": {
+    "cli": true,
+    "projectName": "logsweet",
+    "rootPackage": "logsweet",
+    "mainModule": "core",
+    "description": "Broadcast and receive log messages over network.",
+    "homepage": "https://github.com/mastersign/logsweet",
+    "authorName": "Tobias Kiertscher",
+    "authorEmail": "dev@mastersign.de",
+    "githubUser": "mastersign",
+    "library": false,
+    "year": 2019,
+    "date": "2019-02-21"
+  }
+}

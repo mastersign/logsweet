@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[requires]
+python_version = "3.6"
+
+[packages]
+click = "*"
+pyzmq = "*"
+
+[dev-packages]
+flake8 = "*"
+sphinx = "*"
+sphinx-click = "*"
+sphinx_rtd_theme = "*"
