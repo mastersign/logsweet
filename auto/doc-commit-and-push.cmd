@@ -4,7 +4,8 @@ SETLOCAL
 :: CMD script for commiting unstaged changes in Sphinx documentation HTML output
 :: and pushing subtree to Git branch gh-pages
 
-SET GITHUB_REMOTE=origin
+SET REMOTE=origin
+SET PAGES_BRANCH=gh-pages
 SET DOCS_PATH=doc/build/html
 PUSHD "%~dp0.."
 
@@ -29,18 +30,18 @@ IF %ERRORLEVEL% NEQ 0 (
 	GOTO:ERROR
 )
 
-CALL git fetch %GITHUB_REMOTE% gh-pages
+CALL git fetch %REMOTE% %PAGES_BRANCH%
 IF %ERRORLEVEL% NEQ 0 GOTO:INITIALIZE_SUBTREE
 
-CALL git subtree split --prefix "%DOCS_PATH%" --onto %GITHUB_REMOTE%/gh-pages > gh-pages-ref.txt
+CALL git subtree split --prefix "%DOCS_PATH%" --onto %REMOTE%/%PAGES_BRANCH% > pages-branch-ref.txt
 IF %ERRORLEVEL% NEQ 0 (
 	ECHO.Updating subtree reference failed. Cancelling.
 	GOTO:ERROR
 )
-SET /P gh_pages_ref=<gh-pages-ref.txt
-DEL gh-pages-ref.txt
+SET /P pages_branch_ref=<pages-branch-ref.txt
+DEL pages-branch-ref.txt
 
-CALL git push %GITHUB_REMOTE% %gh_pages_ref%:gh-pages
+CALL git push %REMOTE% %pages_branch_ref%:%PAGES_BRANCH%
 IF %ERRORLEVEL% NEQ 0 (
 	ECHO.Pushing changed docs to branch gh-pages failed.
 	GOTO:ERROR
@@ -60,7 +61,7 @@ PAUSE
 EXIT /B 1
 
 :INITIALIZE_SUBTREE
-CALL git subtree push --prefix "%DOCS_PATH%" %GITHUB_REMOTE% gh-pages
+CALL git subtree push --prefix "%DOCS_PATH%" %REMOTE% %PAGES_BRANCH%
 IF %ERRORLEVEL% NEQ 0 (
 	ECHO.Creating subtree reference failed. Cancelling.
 	GOTO:ERROR

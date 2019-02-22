@@ -2,7 +2,7 @@
 SETLOCAL
 PUSHD "%~dp0.."
 
-:: CMD script for running doc_build in the pipenv
+:: CMD script for running command-doc-build in the pipenv
 
 CALL pipenv run "auto\command-doc-build.cmd" html
 SET STATUS=%ERRORLEVEL%
