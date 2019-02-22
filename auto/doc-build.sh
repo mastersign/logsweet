@@ -13,4 +13,4 @@ function assert_command() {
 
 assert_command pipenv
 
-exec pipenv run auto/command-doc-build.sh $@
+exec pipenv run auto/command-doc-build.sh "$@"
