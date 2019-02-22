@@ -1,6 +1,10 @@
 FROM alpine:latest
 
-RUN apk update && apk add py3-zmq py3-click
+RUN apk update && apk add \
+	py3-click \
+	py3-zmq \
+	yaml \
+	py3-yaml
 
 COPY logsweet /app/logsweet
 
