@@ -3,8 +3,8 @@ logsweet
 
 >    A suite with a variety of tools for handling log messages.
 
-The name `logsweet` is a word play by combining
-`sweet logging` and a `suite of logging tools`.
+The name _logsweet_ is a word play by combining
+_sweet logging_ and a _suite of logging tools_.
 
 ## Installation
 
