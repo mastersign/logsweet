@@ -6,9 +6,9 @@ This module contains the core functionality.
 
 import yaml
 try:
-    from yaml import CLoader as Loader, CDumper as Dumper
+    from yaml import CLoader as Loader
 except ImportError:
-    from yaml import Loader, Dumper
+    from yaml import Loader
 
 
 def _read_config(file):
