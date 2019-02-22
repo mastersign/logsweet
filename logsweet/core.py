@@ -135,15 +135,23 @@ def listen_to_lines(addresses: Sequence[str], interval: float = 0.1):
         An iterable with multiple addresses;
         each in the format of ``<ip>:<port>``.
     :type addresses: Sequence[str]
+
     :param interval:
         The timeout in seconds when waiting for new messages
         before handling possible interruption.
     :type interval: float
     """
 
-    listener = Listener(addresses,
-                        handler=lambda s, f, l: print("LINE {}: {} | {}".format(s, f, l)),
-                        watch_cb=lambda s, f: print("BEGIN {}: {}".format(s, f)),
-                        unwatch_cb=lambda s, f: print("END {}: {}".format(s, f)),
+    def handle_line(source, file_name, line):
+        print("LINE {}: {} | {}".format(source, file_name, line))
+
+    def handle_watch(source, file_name):
+        print("BEGIN {}: {}".format(source, file_name))
+
+    def handle_unwatch(source, file_name):
+        print("END {}: {}".format(source, file_name))
+
+    listener = Listener(addresses, handle_line,
+                        watch_cb=handle_watch, unwatch_cb=handle_unwatch,
                         interval=interval)
     listener.listen()
