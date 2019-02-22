@@ -24,6 +24,7 @@ class TestLogWatcher(TestCase):
 
     def tearDown(self):
         self.watcher.close()
+        self.file.close()
         self.remove_test_files()
 
     def write_file(self, data):
