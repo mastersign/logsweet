@@ -6,3 +6,4 @@ __pycache__/
 /dist/
 /doc/build/*
 !/doc/build/html/
+/auto/*.log
