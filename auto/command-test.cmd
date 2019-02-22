@@ -71,7 +71,10 @@ PUSHD doc
 CALL sphinx-build -M doctest source build %SPHINXOPTS%
 SET STATUS=%ERRORLEVEL%
 POPD
-IF %STATUS% == 0 ECHO.OK
+IF %STATUS% == 0 (
+	ECHO.
+	ECHO.OK
+)
 IF %STATUS% GEQ 1 EXIT /B %STATUS%
 GOTO:EOF
 
