@@ -143,7 +143,8 @@ class LogWatcher(object):
         Starts watching for new lines in matching files
         and for new or removed matching files.
 
-        Currently this is implemented with a busy loop.
+        Blocks until `Ctrl + C` is pressed,
+        or ``SIGINT`` or ``SIGTERM`` is received by the process.
 
         :param interval:
             The polling interval in seconds.

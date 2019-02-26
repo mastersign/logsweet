@@ -6,12 +6,18 @@ log messages over the network.
 """
 
 from typing import Any, Union, Optional, Callable, Sequence
-from time import sleep
-from zmq import Context, ZMQError, PUB, SUB, SUBSCRIBE, NOBLOCK
+from zmq import Context, Poller, PUB, SUB, PUSH, PULL, SUBSCRIBE, NOBLOCK, POLLIN
 from .signals import is_stopped
 
 _TOPIC_ENCODING = 'UTF-8'
 _LINE_ENCODING = 'UTF-8'
+
+
+def _multipart_message(topic: str, line: str):
+    return [
+        topic.encode(encoding=_TOPIC_ENCODING, errors='ignore'),
+        line.encode(encoding=_LINE_ENCODING, errors='ignore')
+    ]
 
 
 class Broadcaster(object):
@@ -41,13 +47,6 @@ class Broadcaster(object):
     def __exit__(self):
         self.close()
 
-    @staticmethod
-    def _multipart_message(topic: str, line: str):
-        return [
-            topic.encode(encoding=_TOPIC_ENCODING, errors='ignore'),
-            line.encode(encoding=_LINE_ENCODING, errors='ignore')
-        ]
-
     def send(self, topic: str, line: str):
         """
         Broadcasts the given text line.
@@ -60,10 +59,66 @@ class Broadcaster(object):
             The text line.
         :type line: str
         """
-        data = self._multipart_message(topic, line.rstrip('\n\r'))
+        data = _multipart_message(topic, line.rstrip('\n\r'))
         self._socket.send_multipart(data)
 
     def close(self):
+        """
+        Closes the ZeroMQ socket and releases allocated resources.
+        """
+        self._socket.close()
+        self._socket = None
+        self._ctx = None
+
+
+class Transmitter(object):
+    """
+    A text line transmitter.
+
+    :parameter connect_addresses:
+        An IP and port to connect the ZeroMQ socket to.
+        E.g. ``["log-proxy-1.my-company.com:9001", "log-proxy-2.my-company.com:9001"]``
+    :type connect_addresses: Sequence[str]
+
+    :parameter ctx:
+        An existing ZeroMQ context to use for the IO work.
+        If `None` uses the default singleton instance.
+    :type ctx: Optional[zmq.Context]
+    """
+
+    def __init__(self,
+                 connect_addresses: Sequence[str],
+                 ctx: Optional[Context] = None):
+        self._ctx = ctx or Context.instance()
+        self._socket = self._ctx.socket(PUSH)
+        for address in connect_addresses:
+            self._socket.connect('tcp://' + address)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self):
+        self.close()
+
+    def send(self, topic: str, line: str):
+        """
+        Transmits the given text line.
+
+        :parameter topic:
+            The topic association of the text line.
+        :type topic: str
+
+        :parameter line:
+            The text line.
+        :type line: str
+        """
+        data = _multipart_message(topic, line.rstrip('\n\r'))
+        self._socket.send_multipart(data)
+
+    def close(self):
+        """
+        Closes the ZeroMQ socket and releases allocated resources.
+        """
         self._socket.close()
         self._socket = None
         self._ctx = None
@@ -71,14 +126,9 @@ class Broadcaster(object):
 
 class Listener(object):
     """
-    Subscribes to one or more ZeroMQ PUB sockets and listens to
-    broadcasted log messages;
-    passing log messages to a callback.
-
-    :param addresses:
-        A sequence of addresses to connect to.
-        E.g. ``["127.0.0.1:9001", "192.168.10.20:9001"]``
-    :type addresses: Sequence[str]
+    Subscribes to one or more ZeroMQ PUB sockets,
+    and/or waits for connections from ZeroMQ PUSH sockets;
+    passing received log messages to a callback.
 
     :param handler:
         A function which is called every time a log message is received;
@@ -101,6 +151,16 @@ class Listener(object):
         this is called with a `filename` argument.
     :type unwatch_cb: Optional[Callable[[str, str], None]]
 
+    :param bind_address:
+        An IP and port to bind the ZeroMQ PULL socket to.
+        E.g. ``127.0.0.1:9000``.
+    :type bind_address: Optional[str]
+
+    :param connect_addresses:
+        A sequence of connect_addresses to connect the ZeroMQ SUB socket to.
+        E.g. ``["log-proxy-1.my-company.com:9001", "192.168.10.20:9001"]``
+    :type connect_addresses: Optional[Sequence[str]]
+
     :param interval:
         The timeout in seconds when waiting for new messages
         before handling possible interruption.
@@ -112,13 +172,16 @@ class Listener(object):
     :type ctx: Optional[zmq.Context]
     """
 
-    def __init__(self, addresses: Sequence[str],
+    def __init__(self,
                  handler: Union[Callable[[str, str, str], None], Any],
                  watch_cb: Optional[Callable[[str, str], None]] = None,
                  unwatch_cb: Optional[Callable[[str, str], None]] = None,
+                 bind_address: Optional[str] = None,
+                 connect_addresses: Optional[Sequence[str]] = None,
                  interval: float = 0.1,
                  ctx: Optional[Context] = None):
-        self._addresses = addresses
+        self._bind_address = bind_address
+        self._connect_addresses = connect_addresses
         if hasattr(handler, 'notify_line') and callable(getattr(handler, 'notify_line')):
             # treat handler as an object with notify_* methods
             self._line_cb = handler.notify_line
@@ -131,7 +194,8 @@ class Listener(object):
             self._unwatch_cb = unwatch_cb
         self._interval = interval
         self._ctx = ctx or Context.instance()
-        self._socket = None
+        self._sub_socket = None
+        self._pull_socket = None
 
     def _handle_message(self, data):
         topic = data[0].decode(encoding=_TOPIC_ENCODING).split('|')
@@ -152,18 +216,47 @@ class Listener(object):
             if callable(self._unwatch_cb):
                 self._unwatch_cb(source_name, file_name)
 
-    def listen(self):
-        self._socket = self._ctx.socket(SUB)
-        self._socket.setsockopt(SUBSCRIBE, 'log|'.encode(encoding=_TOPIC_ENCODING))
-        for address in self._addresses:
-            self._socket.connect('tcp://' + address)
+    def listen(self, topic='log|'):
+        """
+        Listens to incoming log messages on the ZeroMQ socket(s).
+        Blocks until `Ctrl + C` is pressed,
+        or ``SIGINT`` or ``SIGTERM`` is received by the process.
+
+        Returns immediately if either a bind address nor at least
+        one connect address is set.
+
+        :param topic:
+            The topic to subscribe with.
+            Can be used for selecting log messages from specific source.
+            Defaults to ``log|``.
+        :type topic: str
+        """
+        if not self._bind_address and not self._connect_addresses:
+            return
+        poller = Poller()
+        if self._bind_address:
+            self._pull_socket = self._ctx.socket(PULL)
+            self._pull_socket.bind('tcp://' + self._bind_address)
+            poller.register(self._pull_socket, POLLIN)
+        if self._connect_addresses:
+            self._sub_socket = self._ctx.socket(SUB)
+            self._sub_socket.setsockopt(SUBSCRIBE, topic.encode(encoding=_TOPIC_ENCODING))
+            for address in self._connect_addresses:
+                self._sub_socket.connect('tcp://' + address)
+            poller.register(self._sub_socket, POLLIN)
         try:
             while not is_stopped():
-                try:
-                    data = self._socket.recv_multipart(flags=NOBLOCK)
-                except ZMQError:
-                    sleep(self._interval)
-                else:
+                events = dict(poller.poll(self._interval * 1000))
+                if self._pull_socket in events and events[self._pull_socket] == POLLIN:
+                    data = self._pull_socket.recv_multipart(flags=NOBLOCK)
+                    self._handle_message(data)
+                if self._sub_socket in events and events[self._sub_socket] == POLLIN:
+                    data = self._sub_socket.recv_multipart(flags=NOBLOCK)
                     self._handle_message(data)
         finally:
-            self._socket.close()
+            if self._pull_socket:
+                self._pull_socket.close()
+                self._pull_socket = None
+            if self._sub_socket:
+                self._sub_socket.close()
+                self._sub_socket = None

@@ -10,80 +10,108 @@ from random import choice
 from .signals import is_stopped
 from .mock import random_log_message
 from .watch import LogWatcher
-from .net import Broadcaster, Listener
+from .net import Broadcaster, Transmitter, Listener
 
 
 class LogWatcherHandler(object):
 
-    def __init__(self, bc: Broadcaster, name: str, silent: bool):
+    def __init__(self, name: str, silent: bool,
+                 bc: Optional[Broadcaster] = None,
+                 tm: Optional[Transmitter] = None):
         self._bc = bc
+        self._tm = tm
         self._name = name
         self._silent = silent
 
     def notify_watch(self, file_name):
         topic = 'log|watch|{}|{}'.format(self._name, file_name)
-        self._bc.send(topic, '')
+        if self._bc:
+            self._bc.send(topic, '')
+        if self._tm:
+            self._tm.send(topic, '')
         if not self._silent:
             print('START WATCHING: ' + file_name)
 
     def notify_unwatch(self, file_name):
         topic = 'log|unwatch|{}|{}'.format(self._name, file_name)
-        self._bc.send(topic, '')
+        if self._bc:
+            self._bc.send(topic, '')
+        if self._tm:
+            self._tm.send(topic, '')
         if not self._silent:
             print('STOP WATCHING: ' + file_name)
 
     def notify_lines(self, file_name, lines):
         topic = 'log|line|{}|{}'.format(self._name, file_name)
         for l in lines:
-            self._bc.send(topic, l)
+            if self._bc:
+                self._bc.send(topic, l)
+            if self._tm:
+                self._tm.send(topic, l)
             if not self._silent:
                 print('LINE: {} | {}'.format(file_name, l))
 
 
-def write_logfiles(logfiles: Sequence[str], interval: float = 0.5):
+def write_logfiles(logfiles: Sequence[str],
+                   interval: float = 0.5,
+                   max_n: Optional[int] = None):
     """
-    Writes random entries into one or multiple logfiles.
+    Writes random entries into one or multiple log files.
 
     :param logfiles:
-        An iterable with filenames to logfiles.
+        An iterable with file names to log files.
     :type logfiles: Sequence[str]
 
     :param interval:
         The interval for entry generation in seconds.
     :type interval: float
+
+    :param max_n:
+        The maximal number of entries to write.
+    :type max_n: Optional[int]
     """
     print("Writing random entries to the following log files:")
     for fn in logfiles:
         print("  - " + fn)
 
+    n = 0
     try:
         while True:
             with open(choice(logfiles), 'a', encoding='UTF-8') as f:
-                f.write(random_log_message() + '\n')
-            if is_stopped():
+                f.write(random_log_message(n) + '\n')
+            n += 1
+            if is_stopped() or (max_n is not None and n >= max_n):
                 break
             sleep(interval)
     except KeyboardInterrupt:
         return
 
 
-def broadcast_lines(bind_address: str,
-                    file_glob: str,
-                    all_lines: bool = False,
-                    tail_lines: int = 0,
-                    encoding: Optional[str] = None,
-                    name: str = 'unknown',
-                    silent: bool = False):
+def watch_and_send(file_glob: str,
+                   bind_address: Optional[str] = None,
+                   connect_addresses: Optional[Sequence[str]] = None,
+                   all_lines: bool = False,
+                   tail_lines: int = 0,
+                   encoding: Optional[str] = None,
+                   name: str = 'unknown',
+                   silent: bool = False):
     """
-    Start following text files, broadcasting newlines via an ZeroMQ PUB socket.
+    Start following text files, sending new lines
+    via a ZeroMQ PUB and/or PUSH socket.
 
     :param file_glob:
         A path to the text file to tail.
     :type file_glob: str
 
     :param bind_address:
-        The address to bind the socket to.
-    :type bind_address: str
+        The address to bind the PUB socket to;
+        Listening for incoming connections from listeners and proxies.
+    :type bind_address: Optional[str]
+
+    :param connect_addresses:
+        The addresses to connect a PUSH socket to;
+        Actively connecting to one listener or one to many proxies.
+    :type connect_addresses: Optional[Sequence[str]]
 
     :param all_lines:
         A flag to indicate if already existing content
@@ -109,32 +137,51 @@ def broadcast_lines(bind_address: str,
     :type encoding: Optional[str]
     """
     print("Listening to file(s): " + file_glob)
-    print("Publishing on ZeroMQ PUB at: " + bind_address)
+    if bind_address:
+        print("Broadcasting with ZeroMQ PUB at: " + bind_address)
+    if connect_addresses:
+        print("Transmitting with ZeroMQ PUSH to:")
+        for address in connect_addresses:
+            print("  - " + address)
     if all_lines:
-        print("Broadcasting existing content.")
+        print("Broadcasting all existing content.")
     elif tail_lines > 0:
         print("Broadcasting {} trailing lines.".format(tail_lines))
 
-    broadcaster = Broadcaster(bind_address)
-    handler = LogWatcherHandler(broadcaster, name, silent)
+    broadcaster = Broadcaster(bind_address) if bind_address else None
+    transmitter = Transmitter(connect_addresses) if connect_addresses else None
+
+    handler = LogWatcherHandler(name, silent, bc=broadcaster, tm=transmitter)
     watcher = LogWatcher(file_glob, handler,
                          all_lines=all_lines, tail_lines=tail_lines,
                          encoding=encoding)
     try:
         watcher.watch()
     finally:
-        broadcaster.close()
+        if broadcaster:
+            broadcaster.close()
+        if transmitter:
+            transmitter.close()
 
 
-def listen_to_lines(addresses: Sequence[str], interval: float = 0.1):
+def listen_and_print(bind_address: Optional[str] = None,
+                     connect_addresses: Optional[Sequence[str]] = None,
+                     interval: float = 0.1):
     """
-    Subscribes to a number of ZeroMQ PUB sockets
+    Connects to watchers and proxies with a ZeroMQ SUB socket
+    and/or binds a ZeroMQ PULL socket for watchers and proxies
+    to connect to;
     and prints the received lines.
 
-    :param addresses:
-        An iterable with multiple addresses;
-        each in the format of ``<ip>:<port>``.
-    :type addresses: Sequence[str]
+    :param bind_address:
+        The address to bind the PULL socket to.
+        (Listening for incoming connections from watchers or proxies.)
+    :type bind_address: Optional[str]
+
+    :param connect_addresses:
+        The addresses to connect a SUB socket to.
+        (Actively connecting to watchers or proxies.)
+    :type connect_addresses: Optional[Sequence[str]]
 
     :param interval:
         The timeout in seconds when waiting for new messages
@@ -151,7 +198,9 @@ def listen_to_lines(addresses: Sequence[str], interval: float = 0.1):
     def handle_unwatch(source, file_name):
         print("END {}: {}".format(source, file_name))
 
-    listener = Listener(addresses, handle_line,
+    listener = Listener(handle_line,
                         watch_cb=handle_watch, unwatch_cb=handle_unwatch,
+                        bind_address=bind_address,
+                        connect_addresses=connect_addresses,
                         interval=interval)
     listener.listen()
