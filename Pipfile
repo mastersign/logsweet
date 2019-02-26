@@ -9,10 +9,12 @@ python_version = "3.6"
 [packages]
 click = "*"
 pyzmq = "*"
-pyyaml = "*"
+PyYAML = "*"
+colorama = "*"
+blessings = "*"
 
 [dev-packages]
 flake8 = "*"
-sphinx = "*"
 sphinx-click = "*"
-sphinx_rtd_theme = "*"
+Sphinx = "*"
+sphinx-rtd-theme = "*"

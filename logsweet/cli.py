@@ -3,9 +3,12 @@
 This module provides the CLI for the tool.
 """
 
+import colorama
 import click
 import socket
 from .core import write_logfiles, watch_and_send, listen_and_print, proxy as proxy_messages
+
+colorama.init()
 
 
 @click.group(help='A suite with a variety of tools for handling log messages.')

@@ -1,3 +1,5 @@
 click
 pyzmq
-pyyaml
+PyYAML
+colorama
+blessings

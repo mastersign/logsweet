@@ -1,4 +1,4 @@
 flake8
-sphinx
+Sphinx
 sphinx-click
-sphinx_rtd_theme
+sphinx-rtd-theme
