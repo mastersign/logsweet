@@ -110,7 +110,7 @@ def watch_and_send(file_glob: str,
 
     :param connect_addresses:
         The addresses to connect a PUSH socket to;
-        Actively connecting to one listener or one to many proxies.
+        Actively connecting to one listener or multiple proxies.
     :type connect_addresses: Optional[Sequence[str]]
 
     :param all_lines:
@@ -198,9 +198,78 @@ def listen_and_print(bind_address: Optional[str] = None,
     def handle_unwatch(source, file_name):
         print("END {}: {}".format(source, file_name))
 
-    listener = Listener(handle_line,
+    listener = Listener(handler=handle_line,
                         watch_cb=handle_watch, unwatch_cb=handle_unwatch,
                         bind_address=bind_address,
                         connect_addresses=connect_addresses,
                         interval=interval)
     listener.listen()
+
+
+def proxy(backend_bind_address: Optional[str] = None,
+          backend_connect_addresses: Optional[Sequence[str]] = None,
+          frontend_bind_address: Optional[str] = None,
+          frontend_connect_addresses: Optional[Sequence[str]] = None,
+          interval: float = 0.1):
+    """
+    :param backend_bind_address:
+        The address to bind the PULL socket to.
+        (Listening for incoming connections from watchers and other proxies.)
+    :type backend_bind_address: Optional[str]
+
+    :param backend_connect_addresses:
+        The addresses to connect a SUB socket to.
+        (Actively connecting to watchers and other proxies.)
+    :type backend_connect_addresses: Optional[Sequence[str]]
+
+    :param frontend_bind_address:
+        The address to bind a PUB socket to;
+        Listening for incoming connections from listeners or other proxies.
+    :type frontend_bind_address: Optional[str]
+
+    :param frontend_connect_addresses:
+        The addresses to connect a PUSH socket to;
+        Actively connecting to one listener or multiple other proxies.
+    :type frontend_connect_addresses: Optional[Sequence[str]]
+
+    :param interval:
+        The timeout in seconds when waiting for new messages
+        before handling possible interruption.
+    :type interval: float
+    """
+
+    if backend_bind_address:
+        print("Receiving with ZeroMQ PULL at: " + backend_bind_address)
+    if backend_connect_addresses:
+        print("Collecting with ZeroMQ SUB from:")
+        for address in backend_connect_addresses:
+            print("  - " + address)
+
+    if frontend_bind_address:
+        print("Broadcasting with ZeroMQ PUB at: " + frontend_bind_address)
+    if frontend_connect_addresses:
+        print("Transmitting with ZeroMQ PUSH to:")
+        for address in frontend_connect_addresses:
+            print("  - " + address)
+
+    broadcaster = Broadcaster(frontend_bind_address) if frontend_bind_address else None
+    transmitter = Transmitter(frontend_connect_addresses) if frontend_connect_addresses else None
+
+    def handle_message(data: Sequence[bytes]):
+        if broadcaster:
+            broadcaster.send_raw(data)
+        if transmitter:
+            transmitter.send_raw(data)
+
+    listener = Listener(raw_cb=handle_message,
+                        bind_address=backend_bind_address,
+                        connect_addresses=backend_connect_addresses,
+                        interval=interval)
+
+    try:
+        listener.listen()
+    finally:
+        if broadcaster:
+            broadcaster.close()
+        if transmitter:
+            transmitter.close()

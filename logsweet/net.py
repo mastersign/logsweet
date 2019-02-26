@@ -5,7 +5,7 @@ This module contains functionality for transporting
 log messages over the network.
 """
 
-from typing import Any, Union, Optional, Callable, Sequence
+from typing import Any, Union, Optional, Callable, Sequence, Iterable
 from zmq import Context, Poller, PUB, SUB, PUSH, PULL, SUBSCRIBE, NOBLOCK, POLLIN
 from .signals import is_stopped
 
@@ -62,6 +62,15 @@ class Broadcaster(object):
         data = _multipart_message(topic, line.rstrip('\n\r'))
         self._socket.send_multipart(data)
 
+    def send_raw(self, data: Sequence[bytes]):
+        """
+        Broadcasts a raw multipart message.
+        :param data:
+            A raw multipart message.
+        :type data: Sequence[bytes]
+        """
+        self._socket.send_multipart(data)
+
     def close(self):
         """
         Closes the ZeroMQ socket and releases allocated resources.
@@ -76,9 +85,9 @@ class Transmitter(object):
     A text line transmitter.
 
     :parameter connect_addresses:
-        An IP and port to connect the ZeroMQ socket to.
-        E.g. ``["log-proxy-1.my-company.com:9001", "log-proxy-2.my-company.com:9001"]``
-    :type connect_addresses: Sequence[str]
+        An iterable with addresses to connect the ZeroMQ PUSH socket to.
+        E.g. ``["log-proxy-1.my-company.com:9001", "192.168.10.30:9001"]``
+    :type connect_addresses: Iterable[str]
 
     :parameter ctx:
         An existing ZeroMQ context to use for the IO work.
@@ -87,7 +96,7 @@ class Transmitter(object):
     """
 
     def __init__(self,
-                 connect_addresses: Sequence[str],
+                 connect_addresses: Iterable[str],
                  ctx: Optional[Context] = None):
         self._ctx = ctx or Context.instance()
         self._socket = self._ctx.socket(PUSH)
@@ -115,6 +124,15 @@ class Transmitter(object):
         data = _multipart_message(topic, line.rstrip('\n\r'))
         self._socket.send_multipart(data)
 
+    def send_raw(self, data: Sequence[bytes]):
+        """
+        Transmits a raw multipart message.
+        :param data:
+            A raw multipart message.
+        :type data: Sequence[bytes]
+        """
+        self._socket.send_multipart(data)
+
     def close(self):
         """
         Closes the ZeroMQ socket and releases allocated resources.
@@ -137,7 +155,7 @@ class Listener(object):
         Alternatively an object with a method ``notify_line(source, filename, line)``
         and optionally the methods ``notify_watch(source, filename)`` and
         ``notify_unwatch(source, filename)``.
-    :type handler: Union[Callable[[str, str, str], None], Any]
+    :type handler: Optional[Union[Callable[[str, str, str], None], Any]]
 
     :param watch_cb:
         A function which is called every time a file has joined the
@@ -151,15 +169,20 @@ class Listener(object):
         this is called with a `filename` argument.
     :type unwatch_cb: Optional[Callable[[str, str], None]]
 
+    :param raw_cb:
+        A function which is called on every received message.
+        This is called with a sequence of `bytes`; the raw multi-message.
+    type: raw_cb: Optional[Callable[[Sequence[bytes]], None]]
+
     :param bind_address:
         An IP and port to bind the ZeroMQ PULL socket to.
         E.g. ``127.0.0.1:9000``.
     :type bind_address: Optional[str]
 
     :param connect_addresses:
-        A sequence of connect_addresses to connect the ZeroMQ SUB socket to.
+        An iterable of addresses to connect the ZeroMQ SUB socket to.
         E.g. ``["log-proxy-1.my-company.com:9001", "192.168.10.20:9001"]``
-    :type connect_addresses: Optional[Sequence[str]]
+    :type connect_addresses: Optional[Iterable[str]]
 
     :param interval:
         The timeout in seconds when waiting for new messages
@@ -173,16 +196,19 @@ class Listener(object):
     """
 
     def __init__(self,
-                 handler: Union[Callable[[str, str, str], None], Any],
+                 handler: Optional[Union[Callable[[str, str, str], None], Any]] = None,
                  watch_cb: Optional[Callable[[str, str], None]] = None,
                  unwatch_cb: Optional[Callable[[str, str], None]] = None,
+                 raw_cb: Optional[Callable[[Sequence[bytes]], None]] = None,
                  bind_address: Optional[str] = None,
-                 connect_addresses: Optional[Sequence[str]] = None,
+                 connect_addresses: Optional[Iterable[str]] = None,
                  interval: float = 0.1,
                  ctx: Optional[Context] = None):
         self._bind_address = bind_address
-        self._connect_addresses = connect_addresses
-        if hasattr(handler, 'notify_line') and callable(getattr(handler, 'notify_line')):
+        self._connect_addresses = list(connect_addresses)
+        if handler \
+                and hasattr(handler, 'notify_line') \
+                and callable(getattr(handler, 'notify_line')):
             # treat handler as an object with notify_* methods
             self._line_cb = handler.notify_line
             self._watch = getattr(handler, 'notify_watch', watch_cb)
@@ -192,19 +218,27 @@ class Listener(object):
             self._line_cb = handler
             self._watch_cb = watch_cb
             self._unwatch_cb = unwatch_cb
+        self._raw_cb = raw_cb
         self._interval = interval
         self._ctx = ctx or Context.instance()
         self._sub_socket = None
         self._pull_socket = None
 
     def _handle_message(self, data):
+        if self._raw_cb:
+            self._raw_cb(data)
+        if self._line_cb is None \
+                and self._watch_cb is None \
+                and self._unwatch_cb is None:
+            return
         topic = data[0].decode(encoding=_TOPIC_ENCODING).split('|')
         msg_type = topic[1]
         if msg_type == 'line':
             source_name = topic[2]
             file_name = topic[3]
             text = data[1].decode(encoding=_LINE_ENCODING)
-            self._line_cb(source_name, file_name, text)
+            if callable(self._line_cb):
+                self._line_cb(source_name, file_name, text)
         elif msg_type == 'watch':
             source_name = topic[2]
             file_name = topic[3]
@@ -216,7 +250,7 @@ class Listener(object):
             if callable(self._unwatch_cb):
                 self._unwatch_cb(source_name, file_name)
 
-    def listen(self, topic='log|'):
+    def listen(self, topics: Iterable[str] = ("log|",)):
         """
         Listens to incoming log messages on the ZeroMQ socket(s).
         Blocks until `Ctrl + C` is pressed,
@@ -225,11 +259,11 @@ class Listener(object):
         Returns immediately if either a bind address nor at least
         one connect address is set.
 
-        :param topic:
+        :param topics:
             The topic to subscribe with.
             Can be used for selecting log messages from specific source.
-            Defaults to ``log|``.
-        :type topic: str
+            Defaults to ``["log|"]``.
+        :type topics: Iterable[str]
         """
         if not self._bind_address and not self._connect_addresses:
             return
@@ -240,7 +274,8 @@ class Listener(object):
             poller.register(self._pull_socket, POLLIN)
         if self._connect_addresses:
             self._sub_socket = self._ctx.socket(SUB)
-            self._sub_socket.setsockopt(SUBSCRIBE, topic.encode(encoding=_TOPIC_ENCODING))
+            for topic in topics:
+                self._sub_socket.setsockopt(SUBSCRIBE, topic.encode(encoding=_TOPIC_ENCODING))
             for address in self._connect_addresses:
                 self._sub_socket.connect('tcp://' + address)
             poller.register(self._sub_socket, POLLIN)

@@ -5,15 +5,15 @@ This module provides the CLI for the tool.
 
 import click
 import socket
-from .core import write_logfiles, watch_and_send, listen_and_print
+from .core import write_logfiles, watch_and_send, listen_and_print, proxy as proxy_messages
 
 
-@click.group(help='A suite with a variety of tools for handling log messages')
+@click.group(help='A suite with a variety of tools for handling log messages.')
 def main():
     pass
 
 
-@main.command(help='Generate random log file entries')
+@main.command(help='Generate random log file entries.')
 @click.option('-i', '--interval', type=float, default=0.5,
               help='The interval for entry generation in seconds.')
 @click.option('-n', '--max-lines', type=int, default=None,
@@ -24,7 +24,7 @@ def mock(logfiles, interval, max_lines):
 
 
 @main.command(help='Follow logfiles '
-                   'and send new lines via ZeroMQ PUB and/or PUSH socket')
+                   'and send new lines via ZeroMQ PUB and/or PUSH socket.')
 @click.option('-b', '--bind-address', type=str, default=None,
               help='IP and port to bind the ZeroMQ PUB socket.')
 @click.option('-c', '--connect-address', type=str, multiple=True,
@@ -55,7 +55,7 @@ def watch(file_glob, bind_address, connect_address,
                    silent=silent)
 
 
-@main.command(help='Listen to text lines with ZeroMQ SUB and/or PULL socket')
+@main.command(help='Listen to text lines with ZeroMQ SUB and/or PULL socket.')
 @click.option('-b', '--bind-address', type=str, default=None,
               help='IP and port to bind the ZeroMQ PULL socket.')
 @click.option('-c', '--connect-address', type=str, multiple=True,
@@ -65,19 +65,36 @@ def listen(bind_address, connect_address):
                      connect_addresses=connect_address)
 
 
-# @main.command(help='Run a log proxy '
-#                    'for watchers and listeners to connect to. '
-#                    'Allowing listeners and watchers to come and go. '
-#                    'Supporting a high availability architecture '
-#                    'with multiple proxies.')
-# @click.option('-b', '--backend-address', type=str, default='127.0.0.1:9001',
-#               help='The IP and port to bind the PULL socket for the '
-#                    'reception of log messages from watchers.')
-# @click.option('-f', '--frontend-address', type=str, default='127.0.0.1:9002',
-#               help='The IP and port to bind the XPUB socket for the '
-#                    'broadcasting of log messages to listeners.')
-# def proxy(backend_address, frontend_address):
-#     pass
+@main.command(help='Run a log proxy between watchers and listeners. '
+                   'Allowing listeners and watchers to come and go. '
+                   'Supporting a high availability architecture '
+                   'with multiple proxies.')
+@click.option('-bb', '--backend-bind-address', type=str, default=None,
+              help='The IP and port to bind a ZeroMQ PULL socket for '
+                   'collecting log messages from watchers or other proxies.')
+@click.option('-bc', '--backend-connect-address', type=str, multiple=True,
+              help='Hostname(s) or IP(s) with port to connect a ZeroMQ SUB socket '
+                   'for receiving log messages from watchers or other proxies.')
+@click.option('-fb', '--frontend-bind-address', type=str, default=None,
+              help='The IP and port to bind the PUB socket for '
+                   'broadcasting log messages to listeners or other proxies.')
+@click.option('-fc', '--frontend-connect-address', type=str, multiple=True,
+              help='Hostname(s) or IP(s) with port to connect a ZeroMQ PUSH socket '
+                   'for transmitting log messages to a listener or other proxies.')
+def proxy(backend_bind_address,
+          backend_connect_address,
+          frontend_bind_address,
+          frontend_connect_address):
+
+    if backend_bind_address is None and not backend_connect_address:
+        backend_bind_address = '127.0.0.1:9001'
+    if frontend_bind_address is None and not frontend_connect_address:
+        frontend_bind_address = '127.0.0.1:9002'
+
+    proxy_messages(backend_bind_address=backend_bind_address,
+                   backend_connect_addresses=backend_connect_address,
+                   frontend_bind_address=frontend_bind_address,
+                   frontend_connect_addresses=frontend_connect_address)
 
 
 if __name__ == '__main__':
