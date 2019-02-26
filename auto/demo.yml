@@ -1,0 +1,30 @@
+version: '0.1'
+rules:
+  - filter:
+      include: 'mock\.broker'
+    action: drop
+  - filter:
+      include: '\[INFO\]'
+    format:
+      match: bold white
+  - filter:
+      include: '\[WARNING\]'
+    format:
+      line: yellow
+      match: bold yellow
+  - filter:
+      include:
+        - '\[ERROR\]'
+        - 'error|Error|ERROR'
+    format:
+      line: red on dark red
+      match: bold bright red
+  - filter:
+      include: 'blue'
+    format:
+      match: blue
+  - filter:
+      include: 'pink'
+    format:
+      match: magenta
+  
