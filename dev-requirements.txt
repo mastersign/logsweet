@@ -1,4 +1,4 @@
-flake8
-Sphinx
-sphinx-click
-sphinx-rtd-theme
+flake8>=3.7,<4
+Sphinx>=1.8,<2
+sphinx-click>=2,<3
+sphinx-rtd-theme>=0.4,<1

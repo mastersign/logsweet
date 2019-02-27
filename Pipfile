@@ -7,14 +7,17 @@ name = "pypi"
 python_version = "3.6"
 
 [packages]
-click = "*"
-pyzmq = "*"
-PyYAML = "*"
-colorama = "*"
-blessings = "*"
+click = ">=7,<8"
+pyzmq = "<19,>=18"
+PyYAML = ">=4.2b1"
+colorama = ">=0.4,<1"
+blessings = ">=1.7,<2"
 
 [dev-packages]
-flake8 = "*"
-sphinx-click = "*"
-Sphinx = "*"
-sphinx-rtd-theme = "*"
+flake8 = ">=3.7,<4"
+sphinx-click = "<3,>=2"
+Sphinx = "<2,>=1.8"
+sphinx-rtd-theme = ">=0.4,<1"
+
+[pipenv]
+allow_prereleases = true

@@ -31,7 +31,7 @@ PAUSE
 EXIT /B %STATUS%
 
 :PIPENV_LOCK
-CALL pipenv install -r requirements.txt
+CALL pipenv install -r requirements.txt --pre
 SET STATUS=%ERRORLEVEL%
 IF %STATUS% NEQ 0 GOTO:ERROR
 CALL pipenv install --dev -r dev-requirements.txt
