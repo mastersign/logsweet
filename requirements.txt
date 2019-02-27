@@ -2,4 +2,3 @@ click>=7,<8
 pyzmq>=18,<19
 PyYAML>=4.2b1
 colorama>=0.4,<1
-blessings>=1.7,<2

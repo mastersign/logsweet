@@ -3,12 +3,9 @@
 This module provides the CLI for the tool.
 """
 
-import colorama
 import click
 import socket
 from .core import write_logfiles, watch_and_send, listen_and_print, proxy as proxy_messages
-
-colorama.init()
 
 
 @click.group(help='A suite with a variety of tools for handling log messages.')
@@ -63,9 +60,14 @@ def watch(file_glob, bind_address, connect_address,
               help='IP and port to bind the ZeroMQ PULL socket.')
 @click.option('-c', '--connect-address', type=str, multiple=True,
               help='Hostname(s) or IP(s) with port to connect the ZeroMQ SUB socket.')
-def listen(bind_address, connect_address):
+@click.option('-r', '--rules', type=click.Path(exists=True, resolve_path=True,
+                                               file_okay=True, dir_okay=False,
+                                               readable=True),
+              help='A rule configuration file (YAML).')
+def listen(bind_address, connect_address, rules):
     listen_and_print(bind_address=bind_address,
-                     connect_addresses=connect_address)
+                     connect_addresses=connect_address,
+                     rule_file=rules)
 
 
 @main.command(help='Run a log proxy between watchers and listeners. '

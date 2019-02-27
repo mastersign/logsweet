@@ -49,6 +49,7 @@ Options:
   -b, --bind-address TEXT     IP and port to bind the ZeroMQ PULL socket.
   -c, --connect-address TEXT  Hostname(s) or IP(s) with port to connect the
                               ZeroMQ SUB socket.
+  -r, --rules FILE            A rule configuration file (YAML).
   --help                      Show this message and exit.
 ~~~
 

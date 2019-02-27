@@ -4,9 +4,11 @@
 This module contains the core functionality.
 """
 
-from typing import Optional, Sequence
+from typing import Optional, Sequence, TextIO
 from time import sleep
 from random import choice
+
+from logsweet.config import Configuration
 from .signals import is_stopped
 from .mock import random_log_message
 from .watch import LogWatcher
@@ -166,6 +168,7 @@ def watch_and_send(file_glob: str,
 
 def listen_and_print(bind_address: Optional[str] = None,
                      connect_addresses: Optional[Sequence[str]] = None,
+                     rule_file: Optional[TextIO] = None,
                      interval: float = 0.1):
     """
     Connects to watchers and proxies with a ZeroMQ SUB socket
@@ -189,8 +192,13 @@ def listen_and_print(bind_address: Optional[str] = None,
     :type interval: float
     """
 
+    config = Configuration(rule_file) if rule_file else None
+
     def handle_line(source, file_name, line):
-        print("LINE {}: {} | {}".format(source, file_name, line))
+        if config:
+            line = config.process(line)
+        if line is not None:
+            print("LINE {}: {} | {}".format(source, file_name, line))
 
     def handle_watch(source, file_name):
         print("BEGIN {}: {}".format(source, file_name))
