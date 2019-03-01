@@ -1,21 +1,21 @@
 version: '0.1'
-rules:
-#  - filter:
-#      include: 'mock.broker'
-#    action: drop
-  - filter:
-      include: '\[INFO\]'
-    format:
-      line: white
-  - filter:
-      include: '\[WARNING\]'
-    format:
-      line: yellow
-      match: lightyellow
-  - filter:
-      include:
-        - '\[ERROR\]'
-        - 'error|Error|ERROR'
-    format:
-      line: lightred
-      match: black on red
+include:
+  - '^.*$'
+exclude: 'black'
+colors:
+  - pattern: '\[INFO\]'
+    line: lightGrey
+    match: white
+  - pattern: '(?P<level>\[WARNING\]).*$'
+    line: lightGrey
+    match: white
+    level: yellow
+  - pattern: '^[\s\d\-:]*\s(?P<num>\d+)\s+(?P<err>\[ERROR\])'
+    line: red
+    match: firebrick
+    err: black on red
+    num: deepPink
+actions:
+  - pattern: 'BEGIN.*admin\s(?P<thing>.*)$'
+    url: 'http://127.0.0.1:8123/$thing'
+    timeout: 2

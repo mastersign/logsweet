@@ -4,13 +4,14 @@
 This module contains the core functionality.
 """
 
-from typing import Optional
+from typing import Optional, Tuple, Mapping, Union, Sequence
+import re
 import yaml
 try:
     from yaml import CLoader as Loader
 except ImportError:
     from yaml import Loader
-from .rules import Rule
+from .colors import ColorRule
 
 
 def _read_config(file):
@@ -25,6 +26,26 @@ def _read_config(file):
 SUPPORTED_VERSIONS = {'0.1'}
 
 
+class Filter(object):
+
+    def __init__(self, config: Mapping[str, Union[str, Sequence[str]]]):
+
+        include = config['include'] if 'include' in config else []
+        if type(include) is str:
+            include = [include]
+        self._include_patterns = [re.compile(p) for p in include]
+
+        exclude = config['exclude'] if 'exclude' in config else []
+        if type(exclude) is str:
+            exclude = [exclude]
+        self._exclude_patterns = [re.compile(p) for p in exclude]
+
+    def __call__(self, line: str) -> Optional[Tuple[int, int]]:
+        return (len(self._include_patterns) == 0 or
+                any(map(lambda p: p.search(line), self._include_patterns))) \
+            and not any(map(lambda p: p.search(line), self._exclude_patterns))
+
+
 class Configuration(object):
 
     def __init__(self, file):
@@ -35,11 +56,16 @@ class Configuration(object):
         if data.get('version', 'unknown') not in SUPPORTED_VERSIONS:
             raise Exception('Unsupported configuration file format.')
 
-        self._rules = [Rule(r) for r in data['rules']] if 'rules' in data else []
+        self._filter = Filter(data)
+
+        self._colors = [ColorRule(r) for r in data['colors']] \
+            if 'colors' in data else []
 
     def process(self, line: str) -> Optional[str]:
-        for r in self._rules:
+        if not self._filter(line):
+            return None
+        for r in self._colors:
             match, line = r.process(line)
             if match:
-                return line
+                break
         return line

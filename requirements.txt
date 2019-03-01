@@ -1,4 +1,4 @@
 click>=7,<8
 pyzmq>=18,<19
-PyYAML>=4.2b1
-colorama>=0.4,<1
+PyYAML>=3
+colorful>=0.5,<1.0

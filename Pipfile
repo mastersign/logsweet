@@ -9,14 +9,11 @@ python_version = "3.6"
 [packages]
 click = ">=7,<8"
 pyzmq = "<19,>=18"
-PyYAML = ">=4.2b1"
-colorama = ">=0.4,<1"
+PyYAML = ">=3"
+colorful = ">=0.5,<1"
 
 [dev-packages]
 flake8 = ">=3.7,<4"
 sphinx-click = "<3,>=2"
 Sphinx = "<2,>=1.8"
 sphinx-rtd-theme = ">=0.4,<1"
-
-[pipenv]
-allow_prereleases = true
