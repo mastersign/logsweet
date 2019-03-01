@@ -31,6 +31,7 @@ Options:
   -b, --bind-address TEXT     IP and port to bind the ZeroMQ PUB socket.
   -c, --connect-address TEXT  Hostname(s) or IP(s) with port to connect the
                               ZeroMQ PUSH socket.
+  -cfg, --config-file FILE    A configuration file (YAML).
   -a, --all-lines             Broadcast all existing content before following.
   -t, --tail-lines INTEGER    Number of tail lines to broadcast before
                               following.
@@ -49,7 +50,7 @@ Options:
   -b, --bind-address TEXT     IP and port to bind the ZeroMQ PULL socket.
   -c, --connect-address TEXT  Hostname(s) or IP(s) with port to connect the
                               ZeroMQ SUB socket.
-  -r, --rules FILE            A rule configuration file (YAML).
+  -cfg, --config-file FILE    A configuration file (YAML).
   --help                      Show this message and exit.
 ~~~
 

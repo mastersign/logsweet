@@ -6,7 +6,8 @@ log messages over the network.
 """
 
 from typing import Any, Union, Optional, Callable, Sequence, Iterable
-from zmq import Context, Poller, PUB, SUB, PUSH, PULL, SUBSCRIBE, NOBLOCK, POLLIN
+from zmq import Context, Poller, \
+    PUB, SUB, PUSH, PULL, SUBSCRIBE, NOBLOCK, POLLIN
 from .signals import is_stopped
 
 _TOPIC_ENCODING = 'UTF-8'
@@ -24,12 +25,12 @@ class Broadcaster(object):
     """
     A text line broadcaster.
 
-    :parameter bind_address:
+    :param bind_address:
         An IP and port to bind the ZeroMQ socket to.
         E.g. ``127.0.0.1:9001``
     :type bind_address: str
 
-    :parameter ctx:
+    :param ctx:
         An existing ZeroMQ context to use for the IO work.
         If `None` uses the default singleton instance.
     :type ctx: Optional[zmq.Context]
@@ -51,11 +52,11 @@ class Broadcaster(object):
         """
         Broadcasts the given text line.
 
-        :parameter topic:
+        :param topic:
             The topic association of the text line.
         :type topic: str
 
-        :parameter line:
+        :param line:
             The text line.
         :type line: str
         """
@@ -65,6 +66,7 @@ class Broadcaster(object):
     def send_raw(self, data: Sequence[bytes]):
         """
         Broadcasts a raw multipart message.
+
         :param data:
             A raw multipart message.
         :type data: Sequence[bytes]
@@ -84,12 +86,12 @@ class Transmitter(object):
     """
     A text line transmitter.
 
-    :parameter connect_addresses:
+    :param connect_addresses:
         An iterable with addresses to connect the ZeroMQ PUSH socket to.
         E.g. ``["log-proxy-1.my-company.com:9001", "192.168.10.30:9001"]``
     :type connect_addresses: Iterable[str]
 
-    :parameter ctx:
+    :param ctx:
         An existing ZeroMQ context to use for the IO work.
         If `None` uses the default singleton instance.
     :type ctx: Optional[zmq.Context]
@@ -113,11 +115,11 @@ class Transmitter(object):
         """
         Transmits the given text line.
 
-        :parameter topic:
+        :param topic:
             The topic association of the text line.
         :type topic: str
 
-        :parameter line:
+        :param line:
             The text line.
         :type line: str
         """
@@ -127,6 +129,7 @@ class Transmitter(object):
     def send_raw(self, data: Sequence[bytes]):
         """
         Transmits a raw multipart message.
+
         :param data:
             A raw multipart message.
         :type data: Sequence[bytes]
@@ -152,7 +155,8 @@ class Listener(object):
         A function which is called every time a log message is received;
         this is called with `source`, `filename`, and `line` arguments.
 
-        Alternatively an object with a method ``notify_line(source, filename, line)``
+        Alternatively an object with a method
+        ``notify_line(source, filename, line)``
         and optionally the methods ``notify_watch(source, filename)`` and
         ``notify_unwatch(source, filename)``.
     :type handler: Optional[Union[Callable[[str, str, str], None], Any]]
@@ -172,7 +176,7 @@ class Listener(object):
     :param raw_cb:
         A function which is called on every received message.
         This is called with a sequence of `bytes`; the raw multi-message.
-    type: raw_cb: Optional[Callable[[Sequence[bytes]], None]]
+    :type raw_cb: Optional[Callable[[Sequence[bytes]], None]]
 
     :param bind_address:
         An IP and port to bind the ZeroMQ PULL socket to.
@@ -189,7 +193,7 @@ class Listener(object):
         before handling possible interruption.
     :type interval: float
 
-    :parameter ctx:
+    :param ctx:
         An existing ZeroMQ context to use for the IO work.
         If `None` uses the default singleton instance.
     :type ctx: Optional[zmq.Context]
@@ -275,17 +279,20 @@ class Listener(object):
         if self._connect_addresses:
             self._sub_socket = self._ctx.socket(SUB)
             for topic in topics:
-                self._sub_socket.setsockopt(SUBSCRIBE, topic.encode(encoding=_TOPIC_ENCODING))
+                self._sub_socket.setsockopt(
+                    SUBSCRIBE, topic.encode(encoding=_TOPIC_ENCODING))
             for address in self._connect_addresses:
                 self._sub_socket.connect('tcp://' + address)
             poller.register(self._sub_socket, POLLIN)
         try:
             while not is_stopped():
                 events = dict(poller.poll(self._interval * 1000))
-                if self._pull_socket in events and events[self._pull_socket] == POLLIN:
+                if self._pull_socket in events \
+                        and events[self._pull_socket] == POLLIN:
                     data = self._pull_socket.recv_multipart(flags=NOBLOCK)
                     self._handle_message(data)
-                if self._sub_socket in events and events[self._sub_socket] == POLLIN:
+                if self._sub_socket in events \
+                        and events[self._sub_socket] == POLLIN:
                     data = self._sub_socket.recv_multipart(flags=NOBLOCK)
                     self._handle_message(data)
         finally:
