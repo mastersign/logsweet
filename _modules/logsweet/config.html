@@ -1,0 +1,307 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>logsweet.config &mdash; logsweet 0.0.0-dev documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> logsweet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/core.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.core</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/config.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.config</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/colors.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.colors</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/watch.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.watch</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/net.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.net</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/mock.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.mock</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">logsweet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>logsweet.config</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for logsweet.config</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the functionality to load</span>
+<span class="sd">a `logsweet` configuration from a YAML file.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">yaml</span> <span class="k">import</span> <span class="n">CLoader</span> <span class="k">as</span> <span class="n">Loader</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">yaml</span> <span class="k">import</span> <span class="n">Loader</span>
+<span class="kn">from</span> <span class="nn">.colors</span> <span class="k">import</span> <span class="n">ColorRule</span>
+
+
+<span class="k">def</span> <span class="nf">_read_config</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads a YAML configuration file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># wraps the simple yaml.load() call for automatically using</span>
+    <span class="c1"># the C implementation of the yaml parser if available</span>
+    <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">Loader</span><span class="p">)</span>
+
+
+<span class="n">SUPPORTED_VERSIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;0.1&#39;</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="Filter"><a class="viewcode-back" href="../../modules/config.html#logsweet.config.Filter">[docs]</a><span class="k">class</span> <span class="nc">Filter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A filter with zero to many include rules and zero to many exclude rules.</span>
+
+<span class="sd">    :param config:</span>
+<span class="sd">        A dict like structure with the filter configuration.</span>
+<span class="sd">        Can have the keys `include` and/or `exclude`,</span>
+<span class="sd">        each with either a string or a sequence of strings.</span>
+<span class="sd">        Each string represents a regular expression.</span>
+<span class="sd">    :type config: Mapping[str, Union[str, Sequence[str]]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]):</span>
+
+        <span class="n">include</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;include&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;include&#39;</span> <span class="ow">in</span> <span class="n">config</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">include</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">include</span> <span class="o">=</span> <span class="p">[</span><span class="n">include</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_include_patterns</span> <span class="o">=</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">include</span><span class="p">]</span>
+
+        <span class="n">exclude</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;exclude&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;exclude&#39;</span> <span class="ow">in</span> <span class="n">config</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">exclude</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">exclude</span> <span class="o">=</span> <span class="p">[</span><span class="n">exclude</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exclude_patterns</span> <span class="o">=</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__call__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_match</span>
+
+<div class="viewcode-block" id="Filter.is_match"><a class="viewcode-back" href="../../modules/config.html#logsweet.config.Filter.is_match">[docs]</a>    <span class="k">def</span> <span class="nf">is_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks whether a given line passes the filter or not.</span>
+
+<span class="sd">        :param line:</span>
+<span class="sd">            A text line to check.</span>
+<span class="sd">        :type line: str</span>
+
+<span class="sd">        :returns: `True` if the line passes; otherwise `False`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_include_patterns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span>
+                <span class="nb">any</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_include_patterns</span><span class="p">)))</span> \
+            <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exclude_patterns</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="Configuration"><a class="viewcode-back" href="../../modules/config.html#logsweet.config.Configuration">[docs]</a><span class="k">class</span> <span class="nc">Configuration</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `logsweet` configuration.</span>
+
+<span class="sd">    :param file:</span>
+<span class="sd">        The name of a YAML configuration file.</span>
+<span class="sd">    :type file: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">_read_config</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Configuration file does not contain a YAML map.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;unknown&#39;</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">SUPPORTED_VERSIONS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Unsupported configuration file format.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">=</span> <span class="n">Filter</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">ColorRule</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;colors&#39;</span><span class="p">]]</span> \
+            <span class="k">if</span> <span class="s1">&#39;colors&#39;</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">else</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="Configuration.process"><a class="viewcode-back" href="../../modules/config.html#logsweet.config.Configuration.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes a text line.</span>
+
+<span class="sd">        :param line:</span>
+<span class="sd">            A text line to process according to the configuration.</span>
+<span class="sd">        :type line: str</span>
+
+<span class="sd">        :returns:</span>
+<span class="sd">            The potentially modified line or `None`</span>
+<span class="sd">            if the line was dropped during processing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colors</span><span class="p">:</span>
+            <span class="n">match</span><span class="p">,</span> <span class="n">line</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">line</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Tobias Kiertscher
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

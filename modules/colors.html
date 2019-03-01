@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Module logsweet.mock &mdash; logsweet 0.0.0-dev documentation</title>
+  <title>Module logsweet.colors &mdash; logsweet 0.0.0-dev documentation</title>
   
 
   
@@ -35,7 +35,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Module logsweet.net" href="net.html" /> 
+    <link rel="next" title="Module logsweet.watch" href="watch.html" />
+    <link rel="prev" title="Module logsweet.config" href="config.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -87,10 +88,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="core.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.core</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.config</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="colors.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.colors</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Module <code class="docutils literal notranslate"><span class="pre">logsweet.colors</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="watch.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.watch</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="net.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.net</span></code></a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Module <code class="docutils literal notranslate"><span class="pre">logsweet.mock</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="mock.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.mock</span></code></a></li>
 </ul>
 
             
@@ -136,13 +137,13 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Module <code class="docutils literal notranslate"><span class="pre">logsweet.mock</span></code></li>
+      <li>Module <code class="docutils literal notranslate"><span class="pre">logsweet.colors</span></code></li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/modules/mock.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/modules/colors.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -155,29 +156,45 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-logsweet.mock">
-<span id="module-logsweet-mock"></span><h1>Module <code class="docutils literal notranslate"><span class="pre">logsweet.mock</span></code><a class="headerlink" href="#module-logsweet.mock" title="Permalink to this headline">¶</a></h1>
-<p>This module contains functionality for creating mocked log files.</p>
-<dl class="function">
-<dt id="logsweet.mock.random_log_message">
-<code class="descclassname">logsweet.mock.</code><code class="descname">random_log_message</code><span class="sig-paren">(</span><em>n: int = 0</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/logsweet/mock.html#random_log_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.mock.random_log_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a random log message with the following parts:</p>
-<ul class="simple">
-<li>Timestamp in the format <code class="docutils literal notranslate"><span class="pre">yyyy-mm-dd</span> <span class="pre">HH:MM:SS</span></code></li>
-<li>Serial number</li>
-<li>Message level (<cite>INFO</cite>, <cite>WARNING</cite>, or <cite>ERROR</cite>)</li>
-<li>App name <code class="docutils literal notranslate"><span class="pre">mock.&lt;component&gt;</span></code></li>
-<li>Command (<cite>BEGIN</cite>, <cite>PROGRESS</cite>, <cite>END</cite>)</li>
-<li>Additional info text</li>
-</ul>
+  <div class="section" id="module-logsweet.colors">
+<span id="module-logsweet-colors"></span><h1>Module <code class="docutils literal notranslate"><span class="pre">logsweet.colors</span></code><a class="headerlink" href="#module-logsweet.colors" title="Permalink to this headline">¶</a></h1>
+<p>This module contains the functionality to colorize text lines
+according to the match of regular expression.</p>
+<dl class="class">
+<dt id="logsweet.colors.ColorRule">
+<em class="property">class </em><code class="descclassname">logsweet.colors.</code><code class="descname">ColorRule</code><span class="sig-paren">(</span><em>config: Mapping[str, str]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/colors.html#ColorRule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.colors.ColorRule" title="Permalink to this definition">¶</a></dt>
+<dd><p>A coloring rule for applying ANSI colors to a text line
+according to a regular expression.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> (<em>int</em>) – A serial number to identify the message</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – A dict like structure with the following keys:
+<cite>pattern</cite> with the regular expression,
+<cite>line</cite> with a color for the whole line,
+<cite>match</cite> with a color for the matched string,
+and more entries with colors for every named group in the regex.</td>
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="logsweet.colors.ColorRule.process">
+<code class="descname">process</code><span class="sig-paren">(</span><em>line: str</em><span class="sig-paren">)</span> &#x2192; Tuple[bool, str]<a class="reference internal" href="../_modules/logsweet/colors.html#ColorRule.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.colors.ColorRule.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a line and insert ANSI escape sequences for colors
+if the pattern is a match.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<em>str</em>) – The text line to process.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A tuple with a boolean, stating if the pattern matched,
+and the potentially modified text line.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -190,8 +207,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="watch.html" class="btn btn-neutral float-right" title="Module logsweet.watch" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-        <a href="net.html" class="btn btn-neutral float-left" title="Module logsweet.net" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+        <a href="config.html" class="btn btn-neutral float-left" title="Module logsweet.config" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
