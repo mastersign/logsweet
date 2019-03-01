@@ -4,18 +4,24 @@ from typing import Optional, Mapping
 import re
 import os
 
+# check if os is windows
 if os.name == 'nt':
+    # try to enable ANSI escape sequence support in console
     import ctypes
     kernel32 = ctypes.windll.kernel32
     try:
         kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
     except:
+        # otherwise initialize colorama
         import colorama
         colorama.init()
     else:
         import colorama
+        # monkey-patch colorama init, because it is always called by colorful
         colorama.init = lambda: None
 
+# import colorful after potentially monky-patching colorama.init()
+# if os is windows and console does support ANSI sequences
 import colorful
 
 colorful.use_256_ansi_colors()
