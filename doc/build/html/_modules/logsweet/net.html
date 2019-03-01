@@ -158,25 +158,32 @@
 <span class="sd">log messages over the network.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
-<span class="kn">from</span> <span class="nn">zmq</span> <span class="k">import</span> <span class="n">Context</span><span class="p">,</span> <span class="n">ZMQError</span><span class="p">,</span> <span class="n">PUB</span><span class="p">,</span> <span class="n">SUB</span><span class="p">,</span> <span class="n">SUBSCRIBE</span><span class="p">,</span> <span class="n">NOBLOCK</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">zmq</span> <span class="k">import</span> <span class="n">Context</span><span class="p">,</span> <span class="n">Poller</span><span class="p">,</span> \
+    <span class="n">PUB</span><span class="p">,</span> <span class="n">SUB</span><span class="p">,</span> <span class="n">PUSH</span><span class="p">,</span> <span class="n">PULL</span><span class="p">,</span> <span class="n">SUBSCRIBE</span><span class="p">,</span> <span class="n">NOBLOCK</span><span class="p">,</span> <span class="n">POLLIN</span>
 <span class="kn">from</span> <span class="nn">.signals</span> <span class="k">import</span> <span class="n">is_stopped</span>
 
 <span class="n">_TOPIC_ENCODING</span> <span class="o">=</span> <span class="s1">&#39;UTF-8&#39;</span>
 <span class="n">_LINE_ENCODING</span> <span class="o">=</span> <span class="s1">&#39;UTF-8&#39;</span>
 
 
+<span class="k">def</span> <span class="nf">_multipart_message</span><span class="p">(</span><span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">topic</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="n">_TOPIC_ENCODING</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">),</span>
+        <span class="n">line</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="n">_LINE_ENCODING</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="p">]</span>
+
+
 <div class="viewcode-block" id="Broadcaster"><a class="viewcode-back" href="../../modules/net.html#logsweet.net.Broadcaster">[docs]</a><span class="k">class</span> <span class="nc">Broadcaster</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A text line broadcaster.</span>
 
-<span class="sd">    :parameter bind_address:</span>
+<span class="sd">    :param bind_address:</span>
 <span class="sd">        An IP and port to bind the ZeroMQ socket to.</span>
 <span class="sd">        E.g. ``127.0.0.1:9001``</span>
 <span class="sd">    :type bind_address: str</span>
 
-<span class="sd">    :parameter ctx:</span>
+<span class="sd">    :param ctx:</span>
 <span class="sd">        An existing ZeroMQ context to use for the IO work.</span>
 <span class="sd">        If `None` uses the default singleton instance.</span>
 <span class="sd">    :type ctx: Optional[zmq.Context]</span>
@@ -194,53 +201,118 @@
     <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_multipart_message</span><span class="p">(</span><span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span>
-            <span class="n">topic</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="n">_TOPIC_ENCODING</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">),</span>
-            <span class="n">line</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="n">_LINE_ENCODING</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
-        <span class="p">]</span>
-
 <div class="viewcode-block" id="Broadcaster.send"><a class="viewcode-back" href="../../modules/net.html#logsweet.net.Broadcaster.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Broadcasts the given text line.</span>
 
-<span class="sd">        :parameter topic:</span>
+<span class="sd">        :param topic:</span>
 <span class="sd">            The topic association of the text line.</span>
 <span class="sd">        :type topic: str</span>
 
-<span class="sd">        :parameter line:</span>
+<span class="sd">        :param line:</span>
 <span class="sd">            The text line.</span>
 <span class="sd">        :type line: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_multipart_message</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\r</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">_multipart_message</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\r</span><span class="s1">&#39;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="o">.</span><span class="n">send_multipart</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Broadcaster.send_raw"><a class="viewcode-back" href="../../modules/net.html#logsweet.net.Broadcaster.send_raw">[docs]</a>    <span class="k">def</span> <span class="nf">send_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Broadcasts a raw multipart message.</span>
+
+<span class="sd">        :param data:</span>
+<span class="sd">            A raw multipart message.</span>
+<span class="sd">        :type data: Sequence[bytes]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="o">.</span><span class="n">send_multipart</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Broadcaster.close"><a class="viewcode-back" href="../../modules/net.html#logsweet.net.Broadcaster.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Closes the ZeroMQ socket and releases allocated resources.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="Transmitter"><a class="viewcode-back" href="../../modules/net.html#logsweet.net.Transmitter">[docs]</a><span class="k">class</span> <span class="nc">Transmitter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A text line transmitter.</span>
+
+<span class="sd">    :param connect_addresses:</span>
+<span class="sd">        An iterable with addresses to connect the ZeroMQ PUSH socket to.</span>
+<span class="sd">        E.g. ``[&quot;log-proxy-1.my-company.com:9001&quot;, &quot;192.168.10.30:9001&quot;]``</span>
+<span class="sd">    :type connect_addresses: Iterable[str]</span>
+
+<span class="sd">    :param ctx:</span>
+<span class="sd">        An existing ZeroMQ context to use for the IO work.</span>
+<span class="sd">        If `None` uses the default singleton instance.</span>
+<span class="sd">    :type ctx: Optional[zmq.Context]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">connect_addresses</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                 <span class="n">ctx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Context</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx</span> <span class="o">=</span> <span class="n">ctx</span> <span class="ow">or</span> <span class="n">Context</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ctx</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">PUSH</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">address</span> <span class="ow">in</span> <span class="n">connect_addresses</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;tcp://&#39;</span> <span class="o">+</span> <span class="n">address</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Transmitter.send"><a class="viewcode-back" href="../../modules/net.html#logsweet.net.Transmitter.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transmits the given text line.</span>
+
+<span class="sd">        :param topic:</span>
+<span class="sd">            The topic association of the text line.</span>
+<span class="sd">        :type topic: str</span>
+
+<span class="sd">        :param line:</span>
+<span class="sd">            The text line.</span>
+<span class="sd">        :type line: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">_multipart_message</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\r</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="o">.</span><span class="n">send_multipart</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Transmitter.send_raw"><a class="viewcode-back" href="../../modules/net.html#logsweet.net.Transmitter.send_raw">[docs]</a>    <span class="k">def</span> <span class="nf">send_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transmits a raw multipart message.</span>
+
+<span class="sd">        :param data:</span>
+<span class="sd">            A raw multipart message.</span>
+<span class="sd">        :type data: Sequence[bytes]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="o">.</span><span class="n">send_multipart</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Transmitter.close"><a class="viewcode-back" href="../../modules/net.html#logsweet.net.Transmitter.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Closes the ZeroMQ socket and releases allocated resources.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx</span> <span class="o">=</span> <span class="kc">None</span></div></div>
 
 
 <div class="viewcode-block" id="Listener"><a class="viewcode-back" href="../../modules/net.html#logsweet.net.Listener">[docs]</a><span class="k">class</span> <span class="nc">Listener</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Subscribes to one or more ZeroMQ PUB sockets and listens to</span>
-<span class="sd">    broadcasted log messages;</span>
-<span class="sd">    passing log messages to a callback.</span>
-
-<span class="sd">    :param addresses:</span>
-<span class="sd">        A sequence of addresses to connect to.</span>
-<span class="sd">        E.g. ``[&quot;127.0.0.1:9001&quot;, &quot;192.168.10.20:9001&quot;]``</span>
-<span class="sd">    :type addresses: Sequence[str]</span>
+<span class="sd">    Subscribes to one or more ZeroMQ PUB sockets,</span>
+<span class="sd">    and/or waits for connections from ZeroMQ PUSH sockets;</span>
+<span class="sd">    passing received log messages to a callback.</span>
 
 <span class="sd">    :param handler:</span>
 <span class="sd">        A function which is called every time a log message is received;</span>
 <span class="sd">        this is called with `source`, `filename`, and `line` arguments.</span>
 
-<span class="sd">        Alternatively an object with a method ``notify_line(source, filename, line)``</span>
+<span class="sd">        Alternatively an object with a method</span>
+<span class="sd">        ``notify_line(source, filename, line)``</span>
 <span class="sd">        and optionally the methods ``notify_watch(source, filename)`` and</span>
 <span class="sd">        ``notify_unwatch(source, filename)``.</span>
-<span class="sd">    :type handler: Union[Callable[[str, str, str], None], Any]</span>
+<span class="sd">    :type handler: Optional[Union[Callable[[str, str, str], None], Any]]</span>
 
 <span class="sd">    :param watch_cb:</span>
 <span class="sd">        A function which is called every time a file has joined the</span>
@@ -254,25 +326,46 @@
 <span class="sd">        this is called with a `filename` argument.</span>
 <span class="sd">    :type unwatch_cb: Optional[Callable[[str, str], None]]</span>
 
+<span class="sd">    :param raw_cb:</span>
+<span class="sd">        A function which is called on every received message.</span>
+<span class="sd">        This is called with a sequence of `bytes`; the raw multi-message.</span>
+<span class="sd">    :type raw_cb: Optional[Callable[[Sequence[bytes]], None]]</span>
+
+<span class="sd">    :param bind_address:</span>
+<span class="sd">        An IP and port to bind the ZeroMQ PULL socket to.</span>
+<span class="sd">        E.g. ``127.0.0.1:9000``.</span>
+<span class="sd">    :type bind_address: Optional[str]</span>
+
+<span class="sd">    :param connect_addresses:</span>
+<span class="sd">        An iterable of addresses to connect the ZeroMQ SUB socket to.</span>
+<span class="sd">        E.g. ``[&quot;log-proxy-1.my-company.com:9001&quot;, &quot;192.168.10.20:9001&quot;]``</span>
+<span class="sd">    :type connect_addresses: Optional[Iterable[str]]</span>
+
 <span class="sd">    :param interval:</span>
 <span class="sd">        The timeout in seconds when waiting for new messages</span>
 <span class="sd">        before handling possible interruption.</span>
 <span class="sd">    :type interval: float</span>
 
-<span class="sd">    :parameter ctx:</span>
+<span class="sd">    :param ctx:</span>
 <span class="sd">        An existing ZeroMQ context to use for the IO work.</span>
 <span class="sd">        If `None` uses the default singleton instance.</span>
 <span class="sd">    :type ctx: Optional[zmq.Context]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addresses</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-                 <span class="n">handler</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">handler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">watch_cb</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">unwatch_cb</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">raw_cb</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">bind_address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">connect_addresses</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
                  <span class="n">ctx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Context</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_addresses</span> <span class="o">=</span> <span class="n">addresses</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="s1">&#39;notify_line&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="s1">&#39;notify_line&#39;</span><span class="p">)):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bind_address</span> <span class="o">=</span> <span class="n">bind_address</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connect_addresses</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">connect_addresses</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">handler</span> \
+                <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="s1">&#39;notify_line&#39;</span><span class="p">)</span> \
+                <span class="ow">and</span> <span class="n">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="s1">&#39;notify_line&#39;</span><span class="p">)):</span>
             <span class="c1"># treat handler as an object with notify_* methods</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_line_cb</span> <span class="o">=</span> <span class="n">handler</span><span class="o">.</span><span class="n">notify_line</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_watch</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="s1">&#39;notify_watch&#39;</span><span class="p">,</span> <span class="n">watch_cb</span><span class="p">)</span>
@@ -282,18 +375,27 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_line_cb</span> <span class="o">=</span> <span class="n">handler</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_watch_cb</span> <span class="o">=</span> <span class="n">watch_cb</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_unwatch_cb</span> <span class="o">=</span> <span class="n">unwatch_cb</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_cb</span> <span class="o">=</span> <span class="n">raw_cb</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_interval</span> <span class="o">=</span> <span class="n">interval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ctx</span> <span class="o">=</span> <span class="n">ctx</span> <span class="ow">or</span> <span class="n">Context</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sub_socket</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pull_socket</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_handle_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_cb</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_raw_cb</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_cb</span> <span class="ow">is</span> <span class="kc">None</span> \
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_watch_cb</span> <span class="ow">is</span> <span class="kc">None</span> \
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unwatch_cb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
         <span class="n">topic</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="n">_TOPIC_ENCODING</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
         <span class="n">msg_type</span> <span class="o">=</span> <span class="n">topic</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="s1">&#39;line&#39;</span><span class="p">:</span>
             <span class="n">source_name</span> <span class="o">=</span> <span class="n">topic</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
             <span class="n">file_name</span> <span class="o">=</span> <span class="n">topic</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="n">_LINE_ENCODING</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_line_cb</span><span class="p">(</span><span class="n">source_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_line_cb</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_line_cb</span><span class="p">(</span><span class="n">source_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="s1">&#39;watch&#39;</span><span class="p">:</span>
             <span class="n">source_name</span> <span class="o">=</span> <span class="n">topic</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
             <span class="n">file_name</span> <span class="o">=</span> <span class="n">topic</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
@@ -305,21 +407,54 @@
             <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_unwatch_cb</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_unwatch_cb</span><span class="p">(</span><span class="n">source_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">listen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ctx</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">SUB</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">SUBSCRIBE</span><span class="p">,</span> <span class="s1">&#39;log|&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="n">_TOPIC_ENCODING</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">address</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_addresses</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;tcp://&#39;</span> <span class="o">+</span> <span class="n">address</span><span class="p">)</span>
+<div class="viewcode-block" id="Listener.listen"><a class="viewcode-back" href="../../modules/net.html#logsweet.net.Listener.listen">[docs]</a>    <span class="k">def</span> <span class="nf">listen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topics</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;log|&quot;</span><span class="p">,)):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Listens to incoming log messages on the ZeroMQ socket(s).</span>
+<span class="sd">        Blocks until `Ctrl + C` is pressed,</span>
+<span class="sd">        or ``SIGINT`` or ``SIGTERM`` is received by the process.</span>
+
+<span class="sd">        Returns immediately if either a bind address nor at least</span>
+<span class="sd">        one connect address is set.</span>
+
+<span class="sd">        :param topics:</span>
+<span class="sd">            The topic to subscribe with.</span>
+<span class="sd">            Can be used for selecting log messages from specific source.</span>
+<span class="sd">            Defaults to ``[&quot;log|&quot;]``.</span>
+<span class="sd">        :type topics: Iterable[str]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bind_address</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connect_addresses</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">poller</span> <span class="o">=</span> <span class="n">Poller</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bind_address</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pull_socket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ctx</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">PULL</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pull_socket</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s1">&#39;tcp://&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bind_address</span><span class="p">)</span>
+            <span class="n">poller</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pull_socket</span><span class="p">,</span> <span class="n">POLLIN</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connect_addresses</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sub_socket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ctx</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">SUB</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">topic</span> <span class="ow">in</span> <span class="n">topics</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sub_socket</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span>
+                    <span class="n">SUBSCRIBE</span><span class="p">,</span> <span class="n">topic</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="n">_TOPIC_ENCODING</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">address</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connect_addresses</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sub_socket</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;tcp://&#39;</span> <span class="o">+</span> <span class="n">address</span><span class="p">)</span>
+            <span class="n">poller</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sub_socket</span><span class="p">,</span> <span class="n">POLLIN</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">while</span> <span class="ow">not</span> <span class="n">is_stopped</span><span class="p">():</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="o">.</span><span class="n">recv_multipart</span><span class="p">(</span><span class="n">flags</span><span class="o">=</span><span class="n">NOBLOCK</span><span class="p">)</span>
-                <span class="k">except</span> <span class="n">ZMQError</span><span class="p">:</span>
-                    <span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interval</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
+                <span class="n">events</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">poller</span><span class="o">.</span><span class="n">poll</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interval</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">))</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pull_socket</span> <span class="ow">in</span> <span class="n">events</span> \
+                        <span class="ow">and</span> <span class="n">events</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pull_socket</span><span class="p">]</span> <span class="o">==</span> <span class="n">POLLIN</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pull_socket</span><span class="o">.</span><span class="n">recv_multipart</span><span class="p">(</span><span class="n">flags</span><span class="o">=</span><span class="n">NOBLOCK</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_handle_message</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sub_socket</span> <span class="ow">in</span> <span class="n">events</span> \
+                        <span class="ow">and</span> <span class="n">events</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_sub_socket</span><span class="p">]</span> <span class="o">==</span> <span class="n">POLLIN</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sub_socket</span><span class="o">.</span><span class="n">recv_multipart</span><span class="p">(</span><span class="n">flags</span><span class="o">=</span><span class="n">NOBLOCK</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_handle_message</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pull_socket</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pull_socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pull_socket</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sub_socket</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sub_socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sub_socket</span> <span class="o">=</span> <span class="kc">None</span></div></div>
 </pre></div>
 
            </div>

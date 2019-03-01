@@ -159,15 +159,24 @@
 <p>This module contains functionality for creating mocked log files.</p>
 <dl class="function">
 <dt id="logsweet.mock.random_log_message">
-<code class="descclassname">logsweet.mock.</code><code class="descname">random_log_message</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/logsweet/mock.html#random_log_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.mock.random_log_message" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">logsweet.mock.</code><code class="descname">random_log_message</code><span class="sig-paren">(</span><em>n: int = 0</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/logsweet/mock.html#random_log_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.mock.random_log_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a random log message with the following parts:</p>
 <ul class="simple">
 <li>Timestamp in the format <code class="docutils literal notranslate"><span class="pre">yyyy-mm-dd</span> <span class="pre">HH:MM:SS</span></code></li>
+<li>Serial number</li>
 <li>Message level (<cite>INFO</cite>, <cite>WARNING</cite>, or <cite>ERROR</cite>)</li>
 <li>App name <code class="docutils literal notranslate"><span class="pre">mock.&lt;component&gt;</span></code></li>
 <li>Command (<cite>BEGIN</cite>, <cite>PROGRESS</cite>, <cite>END</cite>)</li>
 <li>Additional info text</li>
 </ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> (<em>int</em>) – A serial number to identify the message</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
