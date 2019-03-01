@@ -17,13 +17,16 @@ from .net import Broadcaster, Transmitter, Listener
 
 class LogWatcherHandler(object):
 
-    def __init__(self, name: str, silent: bool,
+    def __init__(self, name: str,
+                 config: Optional[Configuration],
+                 silent: bool,
                  bc: Optional[Broadcaster] = None,
                  tm: Optional[Transmitter] = None):
+        self._name = name
+        self._cfg = config
+        self._silent = silent
         self._bc = bc
         self._tm = tm
-        self._name = name
-        self._silent = silent
 
     def notify_watch(self, file_name):
         topic = 'log|watch|{}|{}'.format(self._name, file_name)
@@ -45,13 +48,16 @@ class LogWatcherHandler(object):
 
     def notify_lines(self, file_name, lines):
         topic = 'log|line|{}|{}'.format(self._name, file_name)
-        for l in lines:
+        for line in lines:
+            line2 = self._cfg.process(line) if self._cfg else line
+            if line2 is None:
+                continue
             if self._bc:
-                self._bc.send(topic, l)
+                self._bc.send(topic, line)
             if self._tm:
-                self._tm.send(topic, l)
+                self._tm.send(topic, line)
             if not self._silent:
-                print('LINE: {} | {}'.format(file_name, l))
+                print('LINE: {} | {}'.format(file_name, line2))
 
 
 def write_logfiles(logfiles: Sequence[str],
@@ -92,6 +98,7 @@ def write_logfiles(logfiles: Sequence[str],
 def watch_and_send(file_glob: str,
                    bind_address: Optional[str] = None,
                    connect_addresses: Optional[Sequence[str]] = None,
+                   config_file: Optional[TextIO] = None,
                    all_lines: bool = False,
                    tail_lines: int = 0,
                    encoding: Optional[str] = None,
@@ -114,6 +121,10 @@ def watch_and_send(file_glob: str,
         The addresses to connect a PUSH socket to;
         Actively connecting to one listener or multiple proxies.
     :type connect_addresses: Optional[Sequence[str]]
+
+    :param config_file:
+        The name of a YAML configuration file.
+    :type config_file: Optional[TextIO]
 
     :param all_lines:
         A flag to indicate if already existing content
@@ -146,14 +157,19 @@ def watch_and_send(file_glob: str,
         for address in connect_addresses:
             print("  - " + address)
     if all_lines:
-        print("Broadcasting all existing content.")
+        print("Reading already existing content.")
     elif tail_lines > 0:
-        print("Broadcasting {} trailing lines.".format(tail_lines))
+        print("Reading {} trailing lines.".format(tail_lines))
 
-    broadcaster = Broadcaster(bind_address) if bind_address else None
-    transmitter = Transmitter(connect_addresses) if connect_addresses else None
+    config = Configuration(config_file) if config_file else None
 
-    handler = LogWatcherHandler(name, silent, bc=broadcaster, tm=transmitter)
+    broadcaster = Broadcaster(bind_address) \
+        if bind_address else None
+    transmitter = Transmitter(connect_addresses) \
+        if connect_addresses else None
+
+    handler = LogWatcherHandler(name, config, silent,
+                                bc=broadcaster, tm=transmitter)
     watcher = LogWatcher(file_glob, handler,
                          all_lines=all_lines, tail_lines=tail_lines,
                          encoding=encoding)
@@ -168,7 +184,7 @@ def watch_and_send(file_glob: str,
 
 def listen_and_print(bind_address: Optional[str] = None,
                      connect_addresses: Optional[Sequence[str]] = None,
-                     rule_file: Optional[TextIO] = None,
+                     config_file: Optional[TextIO] = None,
                      interval: float = 0.1):
     """
     Connects to watchers and proxies with a ZeroMQ SUB socket
@@ -186,13 +202,17 @@ def listen_and_print(bind_address: Optional[str] = None,
         (Actively connecting to watchers or proxies.)
     :type connect_addresses: Optional[Sequence[str]]
 
+    :param config_file:
+        The name of a YAML configuration file.
+    :type config_file: Optional[TextIO]
+
     :param interval:
         The timeout in seconds when waiting for new messages
         before handling possible interruption.
     :type interval: float
     """
 
-    config = Configuration(rule_file) if rule_file else None
+    config = Configuration(config_file) if config_file else None
 
     def handle_line(source, file_name, line):
         if config:
@@ -260,8 +280,10 @@ def proxy(backend_bind_address: Optional[str] = None,
         for address in frontend_connect_addresses:
             print("  - " + address)
 
-    broadcaster = Broadcaster(frontend_bind_address) if frontend_bind_address else None
-    transmitter = Transmitter(frontend_connect_addresses) if frontend_connect_addresses else None
+    broadcaster = Broadcaster(frontend_bind_address) \
+        if frontend_bind_address else None
+    transmitter = Transmitter(frontend_connect_addresses) \
+        if frontend_connect_addresses else None
 
     def handle_message(data: Sequence[bytes]):
         if broadcaster:
