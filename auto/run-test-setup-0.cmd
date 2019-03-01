@@ -10,5 +10,5 @@ START "Log Mock" /D "%~dp0.." pipenv run python -m logsweet.cli ^
 
 PUSHD "%~dp0.."
 CALL pipenv run python -m logsweet.cli ^
-    listen -c 127.0.0.1:9500 -r "%~dp0demo.yml"
+    listen -c 127.0.0.1:9500 -cfg "%~dp0demo.yml"
 POPD

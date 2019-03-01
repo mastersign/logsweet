@@ -6,7 +6,7 @@ cd "$this_dir"
 rm test-1-*.log
 
 xterm -title "Log Listen" -geometry 200x20 -e bash -c \
-    "cd \"$pdir\" && pipenv run python3 -m logsweet.cli listen -c 127.0.0.1:9501 -c 127.0.0.1:9502  -r \"$this_dir/demo.yml\"" &
+    "cd \"$pdir\" && pipenv run python3 -m logsweet.cli listen -c 127.0.0.1:9501 -c 127.0.0.1:9502  -cfg \"$this_dir/demo.yml\"" &
 
 xterm -title "Log Watch A" -geometry 120x10 -e bash -c \
     "cd \"$pdir\" && pipenv run python3 -m logsweet.cli watch -s -b 127.0.0.1:9501 \"$this_dir/test-1-a-*.log\"" &

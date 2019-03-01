@@ -12,4 +12,4 @@ xterm -title "Log Watch" -geometry 120x10 -e bash -c \
     "cd \"$pdir\" && pipenv run python3 -m logsweet.cli watch -s -b 127.0.0.1:9500 \"$this_dir/test-0.log\"" &
 
 cd "$pdir"
-exec pipenv run python3 -m logsweet.cli listen -c 127.0.0.1:9500 -r "$this_dir/demo.yml"
+exec pipenv run python3 -m logsweet.cli listen -c 127.0.0.1:9500 -cfg "$this_dir/demo.yml"
