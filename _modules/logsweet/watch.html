@@ -296,7 +296,8 @@
 <span class="sd">        Starts watching for new lines in matching files</span>
 <span class="sd">        and for new or removed matching files.</span>
 
-<span class="sd">        Currently this is implemented with a busy loop.</span>
+<span class="sd">        Blocks until `Ctrl + C` is pressed,</span>
+<span class="sd">        or ``SIGINT`` or ``SIGTERM`` is received by the process.</span>
 
 <span class="sd">        :param interval:</span>
 <span class="sd">            The polling interval in seconds.</span>

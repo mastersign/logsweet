@@ -20,11 +20,14 @@ CLI Usage
 .. click:: logsweet.cli:main
     :prog: logsweet
 
-.. click:: logsweet.cli:broadcast
-    :prog: logsweet broadcast
+.. click:: logsweet.cli:watch
+    :prog: logsweet watch
 
 .. click:: logsweet.cli:listen
     :prog: logsweet listen
+
+.. click:: logsweet.cli:proxy
+    :prog: logsweet proxy
 
 .. click:: logsweet.cli:mock
     :prog: logsweet mock

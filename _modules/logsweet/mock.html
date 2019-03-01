@@ -169,18 +169,24 @@
 <span class="n">_INFOS_3</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;request&#39;</span><span class="p">,</span> <span class="s1">&#39;response&#39;</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="s1">&#39;exception&#39;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="random_log_message"><a class="viewcode-back" href="../../modules/mock.html#logsweet.mock.random_log_message">[docs]</a><span class="k">def</span> <span class="nf">random_log_message</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="random_log_message"><a class="viewcode-back" href="../../modules/mock.html#logsweet.mock.random_log_message">[docs]</a><span class="k">def</span> <span class="nf">random_log_message</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a random log message with the following parts:</span>
 
 <span class="sd">    - Timestamp in the format ``yyyy-mm-dd HH:MM:SS``</span>
+<span class="sd">    - Serial number</span>
 <span class="sd">    - Message level (`INFO`, `WARNING`, or `ERROR`)</span>
 <span class="sd">    - App name ``mock.&lt;component&gt;``</span>
 <span class="sd">    - Command (`BEGIN`, `PROGRESS`, `END`)</span>
 <span class="sd">    - Additional info text</span>
+
+<span class="sd">    :parameter n:</span>
+<span class="sd">        A serial number to identify the message</span>
+<span class="sd">    :type n: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{ts}</span><span class="s2"> [</span><span class="si">{level}</span><span class="s2">] </span><span class="si">{app}</span><span class="s2">: </span><span class="si">{cmd}</span><span class="s2"> </span><span class="si">{info}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{ts}</span><span class="s2"> </span><span class="si">{n}</span><span class="s2"> [</span><span class="si">{level}</span><span class="s2">] </span><span class="si">{app}</span><span class="s2">: </span><span class="si">{cmd}</span><span class="s2"> </span><span class="si">{info}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="n">ts</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">),</span>
+        <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
         <span class="n">level</span><span class="o">=</span><span class="n">choice</span><span class="p">(</span><span class="n">_LEVELS</span><span class="p">),</span> <span class="n">app</span><span class="o">=</span><span class="n">choice</span><span class="p">(</span><span class="n">_APPS</span><span class="p">),</span> <span class="n">cmd</span><span class="o">=</span><span class="n">choice</span><span class="p">(</span><span class="n">_COMMANDS</span><span class="p">),</span>
         <span class="n">info</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">choice</span><span class="p">(</span><span class="n">_INFOS_1</span><span class="p">),</span> <span class="n">choice</span><span class="p">(</span><span class="n">_INFOS_2</span><span class="p">),</span> <span class="n">choice</span><span class="p">(</span><span class="n">_INFOS_3</span><span class="p">)]))</span></div>
 </pre></div>

@@ -177,6 +177,12 @@ If <cite>None</cite> uses the default singleton instance.</li>
 </tbody>
 </table>
 <dl class="method">
+<dt id="logsweet.net.Broadcaster.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/net.html#Broadcaster.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.net.Broadcaster.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the ZeroMQ socket and releases allocated resources.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="logsweet.net.Broadcaster.send">
 <code class="descname">send</code><span class="sig-paren">(</span><em>topic: str</em>, <em>line: str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/net.html#Broadcaster.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.net.Broadcaster.send" title="Permalink to this definition">¶</a></dt>
 <dd><p>Broadcasts the given text line.</p>
@@ -194,24 +200,37 @@ If <cite>None</cite> uses the default singleton instance.</li>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="logsweet.net.Broadcaster.send_raw">
+<code class="descname">send_raw</code><span class="sig-paren">(</span><em>data: Sequence[bytes]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/net.html#Broadcaster.send_raw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.net.Broadcaster.send_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Broadcasts a raw multipart message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>Sequence</em><em>[</em><em>bytes</em><em>]</em>) – A raw multipart message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="logsweet.net.Listener">
-<em class="property">class </em><code class="descclassname">logsweet.net.</code><code class="descname">Listener</code><span class="sig-paren">(</span><em>addresses: Sequence[str], handler: Union[Callable[[str, str, str], None], Any], watch_cb: Optional[Callable[[str, str], None]] = None, unwatch_cb: Optional[Callable[[str, str], None]] = None, interval: float = 0.1, ctx: Optional[zmq.sugar.context.Context] = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/net.html#Listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.net.Listener" title="Permalink to this definition">¶</a></dt>
-<dd><p>Subscribes to one or more ZeroMQ PUB sockets and listens to
-broadcasted log messages;
-passing log messages to a callback.</p>
+<em class="property">class </em><code class="descclassname">logsweet.net.</code><code class="descname">Listener</code><span class="sig-paren">(</span><em>handler: Union[Callable[[str, str, str], None], Any, None] = None, watch_cb: Optional[Callable[[str, str], None]] = None, unwatch_cb: Optional[Callable[[str, str], None]] = None, raw_cb: Optional[Callable[Sequence[bytes], None]] = None, bind_address: Optional[str] = None, connect_addresses: Optional[Iterable[str]] = None, interval: float = 0.1, ctx: Optional[zmq.sugar.context.Context] = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/net.html#Listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.net.Listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subscribes to one or more ZeroMQ PUB sockets,
+and/or waits for connections from ZeroMQ PUSH sockets;
+passing received log messages to a callback.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>addresses</strong> (<em>Sequence</em><em>[</em><em>str</em><em>]</em>) – A sequence of addresses to connect to.
-E.g. <code class="docutils literal notranslate"><span class="pre">[&quot;127.0.0.1:9001&quot;,</span> <span class="pre">&quot;192.168.10.20:9001&quot;]</span></code></li>
-<li><strong>handler</strong> (<em>Union</em><em>[</em><em>Callable</em><em>[</em><em>[</em><em>str</em><em>, </em><em>str</em><em>, </em><em>str</em><em>]</em><em>, </em><em>None</em><em>]</em><em>, </em><em>Any</em><em>]</em>) – <p>A function which is called every time a log message is received;
+<li><strong>handler</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><em>Callable</em><em>[</em><em>[</em><em>str</em><em>, </em><em>str</em><em>, </em><em>str</em><em>]</em><em>, </em><em>None</em><em>]</em><em>, </em><em>Any</em><em>]</em><em>]</em>) – <p>A function which is called every time a log message is received;
 this is called with <cite>source</cite>, <cite>filename</cite>, and <cite>line</cite> arguments.</p>
-<p>Alternatively an object with a method <code class="docutils literal notranslate"><span class="pre">notify_line(source,</span> <span class="pre">filename,</span> <span class="pre">line)</span></code>
+<p>Alternatively an object with a method
+<code class="docutils literal notranslate"><span class="pre">notify_line(source,</span> <span class="pre">filename,</span> <span class="pre">line)</span></code>
 and optionally the methods <code class="docutils literal notranslate"><span class="pre">notify_watch(source,</span> <span class="pre">filename)</span></code> and
 <code class="docutils literal notranslate"><span class="pre">notify_unwatch(source,</span> <span class="pre">filename)</span></code>.</p>
 </li>
@@ -221,6 +240,12 @@ this is called with a <cite>filename</cite> argument.</li>
 <li><strong>unwatch_cb</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>[</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em><em>, </em><em>None</em><em>]</em><em>]</em>) – A function which is called every time a file has left the
 set of watched files;
 this is called with a <cite>filename</cite> argument.</li>
+<li><strong>raw_cb</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>[</em><em>[</em><em>Sequence</em><em>[</em><em>bytes</em><em>]</em><em>]</em><em>, </em><em>None</em><em>]</em><em>]</em>) – A function which is called on every received message.
+This is called with a sequence of <cite>bytes</cite>; the raw multi-message.</li>
+<li><strong>bind_address</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – An IP and port to bind the ZeroMQ PULL socket to.
+E.g. <code class="docutils literal notranslate"><span class="pre">127.0.0.1:9000</span></code>.</li>
+<li><strong>connect_addresses</strong> (<em>Optional</em><em>[</em><em>Iterable</em><em>[</em><em>str</em><em>]</em><em>]</em>) – An iterable of addresses to connect the ZeroMQ SUB socket to.
+E.g. <code class="docutils literal notranslate"><span class="pre">[&quot;log-proxy-1.my-company.com:9001&quot;,</span> <span class="pre">&quot;192.168.10.20:9001&quot;]</span></code></li>
 <li><strong>interval</strong> (<em>float</em>) – The timeout in seconds when waiting for new messages
 before handling possible interruption.</li>
 <li><strong>ctx</strong> (<em>Optional</em><em>[</em><em>zmq.Context</em><em>]</em>) – An existing ZeroMQ context to use for the IO work.
@@ -230,6 +255,84 @@ If <cite>None</cite> uses the default singleton instance.</li>
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="logsweet.net.Listener.listen">
+<code class="descname">listen</code><span class="sig-paren">(</span><em>topics: Iterable[str] = ('log|'</em>, <em>)</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/net.html#Listener.listen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.net.Listener.listen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Listens to incoming log messages on the ZeroMQ socket(s).
+Blocks until <cite>Ctrl + C</cite> is pressed,
+or <code class="docutils literal notranslate"><span class="pre">SIGINT</span></code> or <code class="docutils literal notranslate"><span class="pre">SIGTERM</span></code> is received by the process.</p>
+<p>Returns immediately if either a bind address nor at least
+one connect address is set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>topics</strong> (<em>Iterable</em><em>[</em><em>str</em><em>]</em>) – The topic to subscribe with.
+Can be used for selecting log messages from specific source.
+Defaults to <code class="docutils literal notranslate"><span class="pre">[&quot;log|&quot;]</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="logsweet.net.Transmitter">
+<em class="property">class </em><code class="descclassname">logsweet.net.</code><code class="descname">Transmitter</code><span class="sig-paren">(</span><em>connect_addresses: Iterable[str], ctx: Optional[zmq.sugar.context.Context] = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/net.html#Transmitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.net.Transmitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>A text line transmitter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>connect_addresses</strong> (<em>Iterable</em><em>[</em><em>str</em><em>]</em>) – An iterable with addresses to connect the ZeroMQ PUSH socket to.
+E.g. <code class="docutils literal notranslate"><span class="pre">[&quot;log-proxy-1.my-company.com:9001&quot;,</span> <span class="pre">&quot;192.168.10.30:9001&quot;]</span></code></li>
+<li><strong>ctx</strong> (<em>Optional</em><em>[</em><em>zmq.Context</em><em>]</em>) – An existing ZeroMQ context to use for the IO work.
+If <cite>None</cite> uses the default singleton instance.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="logsweet.net.Transmitter.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/net.html#Transmitter.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.net.Transmitter.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the ZeroMQ socket and releases allocated resources.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="logsweet.net.Transmitter.send">
+<code class="descname">send</code><span class="sig-paren">(</span><em>topic: str</em>, <em>line: str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/net.html#Transmitter.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.net.Transmitter.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transmits the given text line.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>topic</strong> (<em>str</em>) – The topic association of the text line.</li>
+<li><strong>line</strong> (<em>str</em>) – The text line.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="logsweet.net.Transmitter.send_raw">
+<code class="descname">send_raw</code><span class="sig-paren">(</span><em>data: Sequence[bytes]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/net.html#Transmitter.send_raw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.net.Transmitter.send_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transmits a raw multipart message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>Sequence</em><em>[</em><em>bytes</em><em>]</em>) – A raw multipart message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 </div>

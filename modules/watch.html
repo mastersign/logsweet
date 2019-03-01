@@ -216,7 +216,8 @@ If <cite>None</cite> defaults to <code class="docutils literal notranslate"><spa
 <code class="descname">watch</code><span class="sig-paren">(</span><em>interval: float = 0.1</em>, <em>blocking: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/watch.html#LogWatcher.watch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.watch.LogWatcher.watch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Starts watching for new lines in matching files
 and for new or removed matching files.</p>
-<p>Currently this is implemented with a busy loop.</p>
+<p>Blocks until <cite>Ctrl + C</cite> is pressed,
+or <code class="docutils literal notranslate"><span class="pre">SIGINT</span></code> or <code class="docutils literal notranslate"><span class="pre">SIGTERM</span></code> is received by the process.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

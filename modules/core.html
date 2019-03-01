@@ -158,16 +158,72 @@
 <span id="module-logsweet-core"></span><h1>Module <code class="docutils literal notranslate"><span class="pre">logsweet.core</span></code><a class="headerlink" href="#module-logsweet.core" title="Permalink to this headline">¶</a></h1>
 <p>This module contains the core functionality.</p>
 <dl class="function">
-<dt id="logsweet.core.broadcast_lines">
-<code class="descclassname">logsweet.core.</code><code class="descname">broadcast_lines</code><span class="sig-paren">(</span><em>bind_address: str</em>, <em>file_glob: str</em>, <em>all_lines: bool = False</em>, <em>tail_lines: int = 0</em>, <em>encoding: Optional[str] = None</em>, <em>name: str = 'unknown'</em>, <em>silent: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/core.html#broadcast_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.core.broadcast_lines" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start following text files, broadcasting newlines via an ZeroMQ PUB socket.</p>
+<dt id="logsweet.core.listen_and_print">
+<code class="descclassname">logsweet.core.</code><code class="descname">listen_and_print</code><span class="sig-paren">(</span><em>bind_address: Optional[str] = None</em>, <em>connect_addresses: Optional[Sequence[str]] = None</em>, <em>config_file: Optional[TextIO] = None</em>, <em>interval: float = 0.1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/core.html#listen_and_print"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.core.listen_and_print" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects to watchers and proxies with a ZeroMQ SUB socket
+and/or binds a ZeroMQ PULL socket for watchers and proxies
+to connect to;
+and prints the received lines.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>bind_address</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The address to bind the PULL socket to.
+(Listening for incoming connections from watchers or proxies.)</li>
+<li><strong>connect_addresses</strong> (<em>Optional</em><em>[</em><em>Sequence</em><em>[</em><em>str</em><em>]</em><em>]</em>) – The addresses to connect a SUB socket to.
+(Actively connecting to watchers or proxies.)</li>
+<li><strong>config_file</strong> (<em>Optional</em><em>[</em><em>TextIO</em><em>]</em>) – The name of a YAML configuration file.</li>
+<li><strong>interval</strong> (<em>float</em>) – The timeout in seconds when waiting for new messages
+before handling possible interruption.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="logsweet.core.proxy">
+<code class="descclassname">logsweet.core.</code><code class="descname">proxy</code><span class="sig-paren">(</span><em>backend_bind_address: Optional[str] = None</em>, <em>backend_connect_addresses: Optional[Sequence[str]] = None</em>, <em>frontend_bind_address: Optional[str] = None</em>, <em>frontend_connect_addresses: Optional[Sequence[str]] = None</em>, <em>interval: float = 0.1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/core.html#proxy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.core.proxy" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>backend_bind_address</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The address to bind the PULL socket to.
+(Listening for incoming connections from watchers and other proxies.)</li>
+<li><strong>backend_connect_addresses</strong> (<em>Optional</em><em>[</em><em>Sequence</em><em>[</em><em>str</em><em>]</em><em>]</em>) – The addresses to connect a SUB socket to.
+(Actively connecting to watchers and other proxies.)</li>
+<li><strong>frontend_bind_address</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The address to bind a PUB socket to;
+Listening for incoming connections from listeners or other proxies.</li>
+<li><strong>frontend_connect_addresses</strong> (<em>Optional</em><em>[</em><em>Sequence</em><em>[</em><em>str</em><em>]</em><em>]</em>) – The addresses to connect a PUSH socket to;
+Actively connecting to one listener or multiple other proxies.</li>
+<li><strong>interval</strong> (<em>float</em>) – The timeout in seconds when waiting for new messages
+before handling possible interruption.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="logsweet.core.watch_and_send">
+<code class="descclassname">logsweet.core.</code><code class="descname">watch_and_send</code><span class="sig-paren">(</span><em>file_glob: str</em>, <em>bind_address: Optional[str] = None</em>, <em>connect_addresses: Optional[Sequence[str]] = None</em>, <em>config_file: Optional[TextIO] = None</em>, <em>all_lines: bool = False</em>, <em>tail_lines: int = 0</em>, <em>encoding: Optional[str] = None</em>, <em>name: str = 'unknown'</em>, <em>silent: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/core.html#watch_and_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.core.watch_and_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start following text files, sending new lines
+via a ZeroMQ PUB and/or PUSH socket.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>file_glob</strong> (<em>str</em>) – A path to the text file to tail.</li>
-<li><strong>bind_address</strong> (<em>str</em>) – The address to bind the socket to.</li>
+<li><strong>bind_address</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The address to bind the PUB socket to;
+Listening for incoming connections from listeners and proxies.</li>
+<li><strong>connect_addresses</strong> (<em>Optional</em><em>[</em><em>Sequence</em><em>[</em><em>str</em><em>]</em><em>]</em>) – The addresses to connect a PUSH socket to;
+Actively connecting to one listener or multiple proxies.</li>
+<li><strong>config_file</strong> (<em>Optional</em><em>[</em><em>TextIO</em><em>]</em>) – The name of a YAML configuration file.</li>
 <li><strong>all_lines</strong> (<em>bool</em>) – A flag to indicate if already existing content
 of the file should be broadcasted.</li>
 <li><strong>tail_lines</strong> (<em>int</em>) – Indicates a number of trailing lines to broadcast before
@@ -184,37 +240,17 @@ If <cite>None</cite> defaults to preferred encoding of current user.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="logsweet.core.listen_to_lines">
-<code class="descclassname">logsweet.core.</code><code class="descname">listen_to_lines</code><span class="sig-paren">(</span><em>addresses: Sequence[str], interval: float = 0.1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/core.html#listen_to_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.core.listen_to_lines" title="Permalink to this definition">¶</a></dt>
-<dd><p>Subscribes to a number of ZeroMQ PUB sockets
-and prints the received lines.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>addresses</strong> (<em>Sequence</em><em>[</em><em>str</em><em>]</em>) – An iterable with multiple addresses;
-each in the format of <code class="docutils literal notranslate"><span class="pre">&lt;ip&gt;:&lt;port&gt;</span></code>.</li>
-<li><strong>interval</strong> (<em>float</em>) – The timeout in seconds when waiting for new messages
-before handling possible interruption.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
 <dt id="logsweet.core.write_logfiles">
-<code class="descclassname">logsweet.core.</code><code class="descname">write_logfiles</code><span class="sig-paren">(</span><em>logfiles: Sequence[str], interval: float = 0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/core.html#write_logfiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.core.write_logfiles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes random entries into one or multiple logfiles.</p>
+<code class="descclassname">logsweet.core.</code><code class="descname">write_logfiles</code><span class="sig-paren">(</span><em>logfiles: Sequence[str], interval: float = 0.5, max_n: Optional[int] = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/core.html#write_logfiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.core.write_logfiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes random entries into one or multiple log files.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>logfiles</strong> (<em>Sequence</em><em>[</em><em>str</em><em>]</em>) – An iterable with filenames to logfiles.</li>
+<li><strong>logfiles</strong> (<em>Sequence</em><em>[</em><em>str</em><em>]</em>) – An iterable with file names to log files.</li>
 <li><strong>interval</strong> (<em>float</em>) – The interval for entry generation in seconds.</li>
+<li><strong>max_n</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – The maximal number of entries to write.</li>
 </ul>
 </td>
 </tr>
