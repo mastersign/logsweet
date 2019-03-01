@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from typing import Optional, Mapping
+"""
+This module contains the functionality to colorize text lines
+according to the match of regular expression.
+"""
+
+from typing import Optional, Mapping, Tuple
 import re
 import os
 
@@ -66,6 +71,18 @@ def _build_format_handler(colors: Mapping[str, str], pattern):
 
 
 class ColorRule(object):
+    """
+    A coloring rule for applying ANSI colors to a text line
+    according to a regular expression.
+
+    :param config:
+        A dict like structure with the following keys:
+        `pattern` with the regular expression,
+        `line` with a color for the whole line,
+        `match` with a color for the matched string,
+        and more entries with colors for every named group in the regex.
+    :type config: Mapping[str, str]
+    """
 
     def __init__(self, config: Mapping[str, str]):
         try:
@@ -75,8 +92,21 @@ class ColorRule(object):
             self._pattern = None
         else:
             self._format = _build_format_handler(config, self._pattern)
+        self.__call__ = self.process
 
-    def process(self, line: str):
+    def process(self, line: str) -> Tuple[bool, str]:
+        """
+        Process a line and insert ANSI escape sequences for colors
+        if the pattern is a match.
+
+        :param line:
+            The text line to process.
+        :type line: str
+
+        :return:
+            A tuple with a boolean, stating if the pattern matched,
+            and the potentially modified text line.
+        """
         match = self._pattern.search(line) if self._pattern else None
         if match:
             return True, self._format(line, match)

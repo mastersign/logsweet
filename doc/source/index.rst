@@ -10,9 +10,11 @@ Welcome to logsweet's documentation!
    :caption: Contents:
 
    modules/core
-   modules/mock
-   modules/net
+   modules/config
+   modules/colors
    modules/watch
+   modules/net
+   modules/mock
 
 CLI Usage
 ---------
