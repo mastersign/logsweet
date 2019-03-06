@@ -50,7 +50,6 @@ class Filter(object):
         if type(exclude) is str:
             exclude = [exclude]
         self._exclude_patterns = [re.compile(p) for p in exclude]
-        self.__call__ = self.is_match
 
     def is_match(self, line: str) -> bool:
         """
@@ -65,6 +64,9 @@ class Filter(object):
         return (len(self._include_patterns) == 0 or
                 any(map(lambda p: p.search(line), self._include_patterns))) \
             and not any(map(lambda p: p.search(line), self._exclude_patterns))
+
+    def __call__(self, line: str) -> bool:
+        return self.is_match(line)
 
 
 class Configuration(object):

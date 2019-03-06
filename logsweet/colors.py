@@ -92,7 +92,6 @@ class ColorRule(object):
             self._pattern = None
         else:
             self._format = _build_format_handler(config, self._pattern)
-        self.__call__ = self.process
 
     def process(self, line: str) -> Tuple[bool, str]:
         """
@@ -112,3 +111,6 @@ class ColorRule(object):
             return True, self._format(line, match)
         else:
             return False, line
+
+    def __call__(self, line: str) -> Tuple[bool, str]:
+        return self.process(line)
