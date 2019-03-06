@@ -12,6 +12,7 @@ Welcome to logsweet's documentation!
    modules/core
    modules/config
    modules/colors
+   modules/actions
    modules/watch
    modules/net
    modules/mock

@@ -99,6 +99,7 @@ def watch_and_send(file_glob: str,
                    bind_address: Optional[str] = None,
                    connect_addresses: Optional[Sequence[str]] = None,
                    config_file: Optional[TextIO] = None,
+                   exec_actions: bool = False,
                    all_lines: bool = False,
                    tail_lines: int = 0,
                    encoding: Optional[str] = None,
@@ -125,6 +126,10 @@ def watch_and_send(file_glob: str,
     :param config_file:
         The name of a YAML configuration file.
     :type config_file: Optional[TextIO]
+
+    :param exec_actions:
+        A switch to activate the execution of actions.
+    :type exec_actions: bool
 
     :param all_lines:
         A flag to indicate if already existing content
@@ -161,7 +166,7 @@ def watch_and_send(file_glob: str,
     elif tail_lines > 0:
         print("Reading {} trailing lines.".format(tail_lines))
 
-    config = Configuration(config_file) if config_file else None
+    config = Configuration(config_file, exec_actions) if config_file else None
 
     broadcaster = Broadcaster(bind_address) \
         if bind_address else None
@@ -185,7 +190,8 @@ def watch_and_send(file_glob: str,
 def listen_and_print(bind_address: Optional[str] = None,
                      connect_addresses: Optional[Sequence[str]] = None,
                      config_file: Optional[TextIO] = None,
-                     interval: float = 0.1):
+                     interval: float = 0.1,
+                     exec_actions: bool = False):
     """
     Connects to watchers and proxies with a ZeroMQ SUB socket
     and/or binds a ZeroMQ PULL socket for watchers and proxies
@@ -210,9 +216,13 @@ def listen_and_print(bind_address: Optional[str] = None,
         The timeout in seconds when waiting for new messages
         before handling possible interruption.
     :type interval: float
+
+    :param exec_actions:
+        A switch to activate the execution of actions.
+    :type exec_actions: bool
     """
 
-    config = Configuration(config_file) if config_file else None
+    config = Configuration(config_file, exec_actions) if config_file else None
 
     def handle_line(source, file_name, line):
         if config:

@@ -36,6 +36,9 @@ def mock(logfiles, interval, max_lines):
                               file_okay=True, dir_okay=False,
                               readable=True),
               help='A configuration file (YAML).')
+@click.option('-x', '--exec-actions', is_flag=True,
+              help='Activates the execution of action rules '
+                   'from the configuration.')
 @click.option('-a', '--all-lines', is_flag=True,
               help='Broadcast all existing content before following.')
 @click.option('-t', '--tail-lines', type=int, default=0,
@@ -48,7 +51,8 @@ def mock(logfiles, interval, max_lines):
               help='The source name for the watched logs.')
 @click.argument('file-glob')
 def watch(file_glob, bind_address, connect_address,
-          config_file, all_lines, tail_lines, encoding,
+          config_file, exec_actions,
+          all_lines, tail_lines, encoding,
           name, silent):
     if bind_address is None and not connect_address:
         bind_address = '127.0.0.1:9000'
@@ -56,6 +60,7 @@ def watch(file_glob, bind_address, connect_address,
                    bind_address=bind_address,
                    connect_addresses=connect_address,
                    config_file=config_file,
+                   exec_actions=exec_actions,
                    all_lines=all_lines,
                    tail_lines=tail_lines,
                    encoding=encoding,
@@ -74,10 +79,14 @@ def watch(file_glob, bind_address, connect_address,
                               file_okay=True, dir_okay=False,
                               readable=True),
               help='A configuration file (YAML).')
-def listen(bind_address, connect_address, config_file):
+@click.option('-x', '--exec-actions', is_flag=True,
+              help='Activates the execution of action rules '
+                   'from the configuration.')
+def listen(bind_address, connect_address, config_file, exec_actions):
     listen_and_print(bind_address=bind_address,
                      connect_addresses=connect_address,
-                     config_file=config_file)
+                     config_file=config_file,
+                     exec_actions=exec_actions)
 
 
 @main.command(help='Run a log proxy between watchers and listeners. '

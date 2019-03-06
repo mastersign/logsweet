@@ -13,6 +13,7 @@ try:
 except ImportError:
     from yaml import Loader
 from .colors import ColorRule
+from .actions import HttpActionRule
 
 
 def _read_config(file):
@@ -76,9 +77,13 @@ class Configuration(object):
     :param file:
         The name of a YAML configuration file.
     :type file: str
+
+    :param exec_actions:
+        A switch activate the execution of actions.
+    :type exec_actions: bool
     """
 
-    def __init__(self, file: str):
+    def __init__(self, file: str, exec_actions: bool = False):
         with open(file, 'r', encoding='UTF-8') as f:
             data = _read_config(f)
         if type(data) is not dict:
@@ -86,10 +91,14 @@ class Configuration(object):
         if data.get('version', 'unknown') not in SUPPORTED_VERSIONS:
             raise Exception('Unsupported configuration file format.')
 
+        self._exec_actions = exec_actions
         self._filter = Filter(data)
 
         self._colors = [ColorRule(r) for r in data['colors']] \
             if 'colors' in data else []
+
+        self._actions = [HttpActionRule(r) for r in data['actions']] \
+            if 'actions' in data else []
 
     def process(self, line: str) -> Optional[str]:
         """
@@ -105,6 +114,9 @@ class Configuration(object):
         """
         if not self._filter(line):
             return None
+        if self._exec_actions:
+            for r in self._actions:
+                match, line = r.process(line)
         for r in self._colors:
             match, line = r.process(line)
             if match:

@@ -2,6 +2,10 @@ version: '0.1'
 include:
   - '^.*$'
 exclude: 'black'
+actions:
+  - pattern: '\[ERROR\] .* BEGIN red .* (?P<thing>\w+)$'
+    url: 'http://127.0.0.1:8123/$thing/line'
+    timeout: 2
 colors:
   - pattern: '\[INFO\]'
     line: lightGrey
@@ -10,12 +14,18 @@ colors:
     line: lightGrey
     match: white
     level: yellow
-  - pattern: '^[\s\d\-:]*\s(?P<num>\d+)\s+(?P<err>\[ERROR\])'
-    line: red
-    match: firebrick
+  - pattern: '^(?P<ts>[\s\d\-:]*) (?P<num>\d+)\s+(?P<err>\[ERROR\]) .* BEGIN red .*$'
+    ts: firebrick
+    match: red
     err: black on red
     num: deepPink
-actions:
-  - pattern: 'BEGIN.*admin\s(?P<thing>.*)$'
-    url: 'http://127.0.0.1:8123/$thing'
-    timeout: 2
+  - pattern: '^(?P<ts>[\s\d\-:]*) (?P<num>\d+)\s+(?P<err>\[ERROR\]) .* red .*$'
+    ts: firebrick
+    match: red
+    err: red
+    num: deepPink
+  - pattern: '^[\s\d\-:]*\s(?P<num>\d+)\s+(?P<err>\[ERROR\])'
+    line: lightGrey
+    match: firebrick
+    err: red
+    num: deepPink

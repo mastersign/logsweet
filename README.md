@@ -32,6 +32,8 @@ Options:
   -c, --connect-address TEXT  Hostname(s) or IP(s) with port to connect the
                               ZeroMQ PUSH socket.
   -cfg, --config-file FILE    A configuration file (YAML).
+  -x, --exec-actions          Activates the execution of action rules from the
+                              configuration.
   -a, --all-lines             Broadcast all existing content before following.
   -t, --tail-lines INTEGER    Number of tail lines to broadcast before
                               following.
@@ -51,6 +53,8 @@ Options:
   -c, --connect-address TEXT  Hostname(s) or IP(s) with port to connect the
                               ZeroMQ SUB socket.
   -cfg, --config-file FILE    A configuration file (YAML).
+  -x, --exec-actions          Activates the execution of action rules from the
+                              configuration.
   --help                      Show this message and exit.
 ~~~
 
