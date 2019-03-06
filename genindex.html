@@ -88,6 +88,7 @@
 <li class="toctree-l1"><a class="reference internal" href="modules/core.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.core</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/config.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.config</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/colors.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.colors</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/actions.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.actions</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/watch.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.watch</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/net.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.net</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/mock.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.mock</span></code></a></li>
@@ -161,6 +162,7 @@
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#F"><strong>F</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#P"><strong>P</strong></a>
@@ -221,8 +223,6 @@
         <li><a href="index.html#cmdoption-logsweet-watch-cfg">logsweet-watch command line option</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     -e, --encoding &lt;encoding&gt;
 
@@ -230,6 +230,8 @@
         <li><a href="index.html#cmdoption-logsweet-watch-e">logsweet-watch command line option</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     -fb, --frontend-bind-address &lt;frontend_bind_address&gt;
 
@@ -279,6 +281,15 @@
         <li><a href="index.html#cmdoption-logsweet-watch-t">logsweet-watch command line option</a>
 </li>
       </ul></li>
+      <li>
+    -x, --exec-actions
+
+      <ul>
+        <li><a href="index.html#cmdoption-logsweet-listen-x">logsweet-listen command line option</a>
+</li>
+        <li><a href="index.html#cmdoption-logsweet-watch-x">logsweet-watch command line option</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -325,6 +336,14 @@
   </ul></td>
 </tr></table>
 
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/actions.html#logsweet.actions.HttpActionRule">HttpActionRule (class in logsweet.actions)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -358,6 +377,8 @@
         <li><a href="index.html#cmdoption-logsweet-listen-c">-c, --connect-address &lt;connect_address&gt;</a>
 </li>
         <li><a href="index.html#cmdoption-logsweet-listen-cfg">-cfg, --config-file &lt;config_file&gt;</a>
+</li>
+        <li><a href="index.html#cmdoption-logsweet-listen-x">-x, --exec-actions</a>
 </li>
       </ul></li>
       <li>
@@ -406,9 +427,13 @@
 </li>
         <li><a href="index.html#cmdoption-logsweet-watch-t">-t, --tail-lines &lt;tail_lines&gt;</a>
 </li>
+        <li><a href="index.html#cmdoption-logsweet-watch-x">-x, --exec-actions</a>
+</li>
         <li><a href="index.html#cmdoption-logsweet-watch-arg-file-glob">FILE_GLOB</a>
 </li>
       </ul></li>
+      <li><a href="modules/actions.html#module-logsweet.actions">logsweet.actions (module)</a>
+</li>
       <li><a href="modules/colors.html#module-logsweet.colors">logsweet.colors (module)</a>
 </li>
       <li><a href="modules/config.html#module-logsweet.config">logsweet.config (module)</a>
@@ -429,9 +454,11 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/colors.html#logsweet.colors.ColorRule.process">process() (logsweet.colors.ColorRule method)</a>
+      <li><a href="modules/actions.html#logsweet.actions.HttpActionRule.process">process() (logsweet.actions.HttpActionRule method)</a>
 
       <ul>
+        <li><a href="modules/colors.html#logsweet.colors.ColorRule.process">(logsweet.colors.ColorRule method)</a>
+</li>
         <li><a href="modules/config.html#logsweet.config.Configuration.process">(logsweet.config.Configuration method)</a>
 </li>
       </ul></li>

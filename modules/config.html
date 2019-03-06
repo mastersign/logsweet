@@ -89,6 +89,7 @@
 <li class="toctree-l1"><a class="reference internal" href="core.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.core</span></code></a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Module <code class="docutils literal notranslate"><span class="pre">logsweet.config</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="colors.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.colors</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="actions.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.actions</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="watch.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.watch</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="net.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.net</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="mock.html">Module <code class="docutils literal notranslate"><span class="pre">logsweet.mock</span></code></a></li>
@@ -162,13 +163,17 @@
 a <cite>logsweet</cite> configuration from a YAML file.</p>
 <dl class="class">
 <dt id="logsweet.config.Configuration">
-<em class="property">class </em><code class="descclassname">logsweet.config.</code><code class="descname">Configuration</code><span class="sig-paren">(</span><em>file: str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/config.html#Configuration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.config.Configuration" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">logsweet.config.</code><code class="descname">Configuration</code><span class="sig-paren">(</span><em>file: str</em>, <em>exec_actions: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/config.html#Configuration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.config.Configuration" title="Permalink to this definition">¶</a></dt>
 <dd><p>The <cite>logsweet</cite> configuration.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file</strong> (<em>str</em>) – The name of a YAML configuration file.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>file</strong> (<em>str</em>) – The name of a YAML configuration file.</li>
+<li><strong>exec_actions</strong> (<em>bool</em>) – A switch activate the execution of actions.</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
