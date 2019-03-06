@@ -1,10 +1,28 @@
 @ECHO OFF
 SETLOCAL
-PUSHD "%~dp0.."
 
-:: CMD script for running command-doc-build in the pipenv
+:: CMD script for building the HTML output of the Sphinx documentation
 
-CALL pipenv run "auto\command-doc-build.cmd" html
+PUSHD "%~dp0..\doc"
+SET SOURCEDIR=source
+SET BUILDDIR=build
+
+CALL:ASSERT_COMMAND sphinx-build
+IF ERRORLEVEL 1 (
+	CALL:PACKAGE_INSTALL_INFO sphinx Sphinx http://sphinx-doc.org/
+	GOTO:ERROR
+)
+
+IF "%1" == "" (
+	SET FORMAT=html
+) ELSE (
+	SET FORMAT=%1
+)
+
+IF NOT EXIST "%SOURCEDIR%\_static\" MKDIR "%SOURCEDIR%\_static"
+IF NOT EXIST "%SOURCEDIR%\_templates\" MKDIR "%SOURCEDIR%\_templates"
+
+CALL sphinx-build -M %FORMAT% %SOURCEDIR% %BUILDDIR% %SPHINXOPTS%
 SET STATUS=%ERRORLEVEL%
 IF %STATUS% NEQ 0 GOTO:ERROR
 
@@ -18,5 +36,28 @@ GOTO:EOF
 
 :ERROR
 POPD
-PAUSE
 EXIT /B %STATUS%
+
+:ASSERT_COMMAND
+SET NAME=%1
+WHERE %NAME% >NUL 2>&1
+IF ERRORLEVEL 1 (
+	ECHO.
+	ECHO.The command '%NAME%' was not found in PATH.
+	EXIT /B 1
+)
+GOTO:EOF
+
+:PACKAGE_INSTALL_INFO
+SET PACKAGE=%1
+SET TITLE=%2
+SET URL=%3
+ECHO.
+ECHO.Install %TITLE% with:
+ECHO.
+ECHO.pip install %PACKAGE%
+ECHO.or
+ECHO.pip install --user %PACKAGE%
+ECHO.
+ECHO.Or grab it from %URL%
+GOTO:EOF

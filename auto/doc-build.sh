@@ -1,16 +1,37 @@
 #!/usr/bin/env bash
 
-# Bash script for running command-doc-build in the pipenv
+# Bash script for building the HTML output of the Sphinx documentation
 
-cd "$(dirname $0)/.."
+cd "$(dirname $0)/../doc"
+source_dir=source
+build_dir=build
 
-function assert_command() {
+function assert_python_cli() {
+    command="$1"
+    package="$2"
+    title="$3"
+    url="$4"
     if ! which $1 >/dev/null 2>&1; then
-        echo "The command '$1' was not found in PATH."
+        echo "The command '$command' was not found in PATH."
+        echo ""
+        echo "Install $title with:"
+        echo ""
+        echo "pip3 install --user $package"
+        echo ""
+        echo "Or grab it from $url"
         exit 1
     fi
 }
 
-assert_command pipenv
+assert_python_cli sphinx-build sphinx Sphinx http://sphinx-doc.org/
 
-exec pipenv run auto/command-doc-build.sh "$@"
+if [ "$1" == "" ]; then
+    format="html"
+else
+    format="$1"
+fi
+
+if ! [ -d "$source_dir/_static" ]; then mkdir "$source_dir/_static"; fi
+if ! [ -d "$source_dir/_templates" ]; then mkdir "$source_dir/_templates"; fi
+
+exec sphinx-build -M $format "$source_dir" "$build_dir" $SPHINXOPTS
