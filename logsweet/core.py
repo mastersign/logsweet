@@ -234,6 +234,27 @@ def listen_and_print(bind_address: Optional[str] = None,
     listener.listen()
 
 
+def _proxy_greeting(
+        backend_bind_address: Optional[str] = None,
+        backend_connect_addresses: Optional[Sequence[str]] = None,
+        frontend_bind_address: Optional[str] = None,
+        frontend_connect_addresses: Optional[Sequence[str]] = None):
+
+    if backend_bind_address:
+        print("Receiving with ZeroMQ PULL at: " + backend_bind_address)
+    if backend_connect_addresses:
+        print("Collecting with ZeroMQ SUB from:")
+        for address in backend_connect_addresses:
+            print("  - " + address)
+
+    if frontend_bind_address:
+        print("Broadcasting with ZeroMQ PUB at: " + frontend_bind_address)
+    if frontend_connect_addresses:
+        print("Transmitting with ZeroMQ PUSH to:")
+        for address in frontend_connect_addresses:
+            print("  - " + address)
+
+
 def proxy(backend_bind_address: Optional[str] = None,
           backend_connect_addresses: Optional[Sequence[str]] = None,
           frontend_bind_address: Optional[str] = None,
@@ -266,19 +287,8 @@ def proxy(backend_bind_address: Optional[str] = None,
     :type interval: float
     """
 
-    if backend_bind_address:
-        print("Receiving with ZeroMQ PULL at: " + backend_bind_address)
-    if backend_connect_addresses:
-        print("Collecting with ZeroMQ SUB from:")
-        for address in backend_connect_addresses:
-            print("  - " + address)
-
-    if frontend_bind_address:
-        print("Broadcasting with ZeroMQ PUB at: " + frontend_bind_address)
-    if frontend_connect_addresses:
-        print("Transmitting with ZeroMQ PUSH to:")
-        for address in frontend_connect_addresses:
-            print("  - " + address)
+    _proxy_greeting(backend_bind_address, backend_connect_addresses,
+                    frontend_bind_address, frontend_connect_addresses)
 
     broadcaster = Broadcaster(frontend_bind_address) \
         if frontend_bind_address else None

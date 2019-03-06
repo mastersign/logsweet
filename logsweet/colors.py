@@ -16,7 +16,7 @@ if os.name == 'nt':
     kernel32 = ctypes.windll.kernel32
     try:
         kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
-    except:
+    except:  # noqa: E722
         # otherwise initialize colorama
         import colorama
         colorama.init()
@@ -27,7 +27,7 @@ if os.name == 'nt':
 
 # import colorful after potentially monky-patching colorama.init()
 # if os is windows and console does support ANSI sequences
-import colorful
+import colorful  # noqa: E402
 
 colorful.use_256_ansi_colors()
 
