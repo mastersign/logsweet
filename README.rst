@@ -9,7 +9,7 @@ The name *logsweet* is a word play by combining *sweet logging* and a
 Requirements
 ------------
 
--  Python ≥3.3
+-  Python ≥3.4
 
 Installation
 ------------

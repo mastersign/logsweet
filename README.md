@@ -8,7 +8,7 @@ _sweet logging_ and a _suite of logging tools_.
 
 ## Requirements
 
-* Python &ge;3.3
+* Python &ge;3.4
 
 ## Installation
 
