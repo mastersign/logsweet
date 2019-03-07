@@ -34,4 +34,4 @@ fi
 if ! [ -d "$source_dir/_static" ]; then mkdir "$source_dir/_static"; fi
 if ! [ -d "$source_dir/_templates" ]; then mkdir "$source_dir/_templates"; fi
 
-exec sphinx-build -M $format "$source_dir" "$build_dir" $SPHINXOPTS
+exec sphinx-build -b $format -E "$source_dir" "$build_dir" $SPHINXOPTS
