@@ -13,7 +13,7 @@ def read_info_files(*names):
         for extension in ('.txt', '.rst'):
             filename = name + extension
             if os.path.isfile(filename):
-                with open(filename) as fd:
+                with open(filename, encoding='UTF-8') as fd:
                     value = fd.read()
                 break
         values[name] = value
