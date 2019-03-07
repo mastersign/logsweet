@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import os
-from setuptools import setup, find_packages
-
+from setuptools import find_packages
+from cx_Freeze import setup, Executable
 import logsweet
 
 
@@ -39,6 +39,12 @@ long_description = """
 
 data_files = None
 
+build_exe_options = {
+    "includes": ["idna.idnadata"],
+    "excludes": ["tkinter"],
+    "optimize": 2,
+}
+
 setup(
     name='logsweet',
     version=logsweet.__version__,
@@ -72,4 +78,10 @@ setup(
         ]
     },
     install_requires=read_dependencies(),
+    options = {
+        'build_exe': build_exe_options
+    },
+    executables = [
+        Executable(targetName="logsweet.exe", script="exe_cli.py")
+    ],
 )
