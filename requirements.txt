@@ -1,5 +1,5 @@
-click>=7,<8
-pyzmq>=18,<19
+click>=6
+pyzmq>=16
 PyYAML>=3
 colorful>=0.5,<1
 requests-futures>=0.9,<1

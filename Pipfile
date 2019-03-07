@@ -7,8 +7,8 @@ name = "pypi"
 python_version = "3.6"
 
 [packages]
-click = ">=7,<8"
-pyzmq = "<19,>=18"
+click = ">=6"
+pyzmq = ">=16"
 PyYAML = ">=3"
 colorful = ">=0.5,<1"
 requests-futures = ">=0.9,<1"
