@@ -95,6 +95,24 @@ def write_logfiles(logfiles: Sequence[str],
         return
 
 
+def _watch_and_send_greeting(**kwargs):
+    print("Listening to file(s): " + kwargs.get('file_glob'))
+    if kwargs.get('bind_address'):
+        print("Broadcasting with ZeroMQ PUB at: " + kwargs.get('bind_address'))
+    if kwargs.get('connect_addresses'):
+        print("Transmitting with ZeroMQ PUSH to:")
+        for address in kwargs.get('connect_addresses'):
+            print("  - " + address)
+    if kwargs.get('all_lines'):
+        print("Reading already existing content.")
+    elif kwargs.get('tail_lines') > 0:
+        print("Reading {} trailing lines.".format(kwargs.get('tail_lines')))
+    if kwargs.get('config_file'):
+        print("Using YAML configuration.")
+        if kwargs.get('exec_actions'):
+            print("Executing actions from configuration.")
+
+
 def watch_and_send(file_glob: str,
                    bind_address: Optional[str] = None,
                    connect_addresses: Optional[Sequence[str]] = None,
@@ -154,17 +172,7 @@ def watch_and_send(file_glob: str,
         If `None` defaults to preferred encoding of current user.
     :type encoding: Optional[str]
     """
-    print("Listening to file(s): " + file_glob)
-    if bind_address:
-        print("Broadcasting with ZeroMQ PUB at: " + bind_address)
-    if connect_addresses:
-        print("Transmitting with ZeroMQ PUSH to:")
-        for address in connect_addresses:
-            print("  - " + address)
-    if all_lines:
-        print("Reading already existing content.")
-    elif tail_lines > 0:
-        print("Reading {} trailing lines.".format(tail_lines))
+    _watch_and_send_greeting(**locals())
 
     config = Configuration(config_file, exec_actions) if config_file else None
 
@@ -244,24 +252,21 @@ def listen_and_print(bind_address: Optional[str] = None,
     listener.listen()
 
 
-def _proxy_greeting(
-        backend_bind_address: Optional[str] = None,
-        backend_connect_addresses: Optional[Sequence[str]] = None,
-        frontend_bind_address: Optional[str] = None,
-        frontend_connect_addresses: Optional[Sequence[str]] = None):
-
-    if backend_bind_address:
-        print("Receiving with ZeroMQ PULL at: " + backend_bind_address)
-    if backend_connect_addresses:
+def _proxy_greeting(**kwargs):
+    if kwargs.get('backend_bind_address'):
+        print("Receiving with ZeroMQ PULL at: " +
+              kwargs.get('backend_bind_address'))
+    if kwargs.get('backend_connect_addresses'):
         print("Collecting with ZeroMQ SUB from:")
-        for address in backend_connect_addresses:
+        for address in kwargs.get('backend_connect_addresses'):
             print("  - " + address)
 
-    if frontend_bind_address:
-        print("Broadcasting with ZeroMQ PUB at: " + frontend_bind_address)
-    if frontend_connect_addresses:
+    if kwargs.get('frontend_bind_address'):
+        print("Broadcasting with ZeroMQ PUB at: " +
+              kwargs.get('frontend_bind_address'))
+    if kwargs.get('frontend_connect_addresses'):
         print("Transmitting with ZeroMQ PUSH to:")
-        for address in frontend_connect_addresses:
+        for address in kwargs.get('frontend_connect_addresses'):
             print("  - " + address)
 
 
@@ -296,9 +301,7 @@ def proxy(backend_bind_address: Optional[str] = None,
         before handling possible interruption.
     :type interval: float
     """
-
-    _proxy_greeting(backend_bind_address, backend_connect_addresses,
-                    frontend_bind_address, frontend_connect_addresses)
+    _proxy_greeting(**locals())
 
     broadcaster = Broadcaster(frontend_bind_address) \
         if frontend_bind_address else None
