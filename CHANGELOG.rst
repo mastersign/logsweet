@@ -31,6 +31,15 @@ After this project reaches the version number 1.0.0 it will follow
 Unreleased
 ==========
 
+Added
+-----
+
+- proxy
+- binding and connecting on all sides
+- Docker release
+- YAML configuration for filtering, coloring and HTTP actions
+- improved CLI
+
 0.0.0 - 2019-02-21
 ===================
 
@@ -38,3 +47,7 @@ Added
 -----
 
 - basic project structure
+- text file watcher with ZeroMQ PUB
+- ZeroMQ SUB with printing
+- mockup log files
+- basic CLI
