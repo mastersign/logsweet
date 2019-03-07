@@ -214,7 +214,7 @@ before handling possible interruption.</li>
 
 <dl class="function">
 <dt id="logsweet.core.watch_and_send">
-<code class="descclassname">logsweet.core.</code><code class="descname">watch_and_send</code><span class="sig-paren">(</span><em>file_glob: str</em>, <em>bind_address: Optional[str] = None</em>, <em>connect_addresses: Optional[Sequence[str]] = None</em>, <em>config_file: Optional[TextIO] = None</em>, <em>exec_actions: bool = False</em>, <em>all_lines: bool = False</em>, <em>tail_lines: int = 0</em>, <em>encoding: Optional[str] = None</em>, <em>name: str = 'unknown'</em>, <em>silent: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/core.html#watch_and_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.core.watch_and_send" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">logsweet.core.</code><code class="descname">watch_and_send</code><span class="sig-paren">(</span><em>file_glob: str</em>, <em>bind_address: Optional[str] = None</em>, <em>connect_addresses: Optional[Sequence[str]] = None</em>, <em>config_file: Optional[TextIO] = None</em>, <em>exec_actions: bool = False</em>, <em>all_lines: bool = False</em>, <em>tail_lines: int = 0</em>, <em>encoding: Optional[str] = None</em>, <em>name: str = 'unknown'</em>, <em>echo: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/logsweet/core.html#watch_and_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logsweet.core.watch_and_send" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start following text files, sending new lines
 via a ZeroMQ PUB and/or PUSH socket.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -234,7 +234,7 @@ of the file should be broadcasted.</li>
 <li><strong>tail_lines</strong> (<em>int</em>) – Indicates a number of trailing lines to broadcast before
 following new lines.</li>
 <li><strong>name</strong> (<em>str</em>) – The name of this broadcaster.</li>
-<li><strong>silent</strong> (<em>bool</em>) – If <cite>False</cite>, new lines are printed to the console.</li>
+<li><strong>echo</strong> (<em>bool</em>) – If <cite>True</cite>, new lines are printed to the console.</li>
 <li><strong>encoding</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Specifies the encoding for reading the text files.
 If <cite>None</cite> defaults to preferred encoding of current user.</li>
 </ul>
