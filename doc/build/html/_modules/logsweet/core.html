@@ -175,12 +175,12 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                  <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Configuration</span><span class="p">],</span>
-                 <span class="n">silent</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+                 <span class="n">echo</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
                  <span class="n">bc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Broadcaster</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">tm</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Transmitter</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span> <span class="o">=</span> <span class="n">config</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_silent</span> <span class="o">=</span> <span class="n">silent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_echo</span> <span class="o">=</span> <span class="n">echo</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bc</span> <span class="o">=</span> <span class="n">bc</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tm</span> <span class="o">=</span> <span class="n">tm</span>
 
@@ -190,7 +190,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_bc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tm</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_tm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_silent</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_echo</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;START WATCHING: &#39;</span> <span class="o">+</span> <span class="n">file_name</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">notify_unwatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
@@ -199,7 +199,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_bc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tm</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_tm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_silent</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_echo</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;STOP WATCHING: &#39;</span> <span class="o">+</span> <span class="n">file_name</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">notify_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">lines</span><span class="p">):</span>
@@ -212,7 +212,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_bc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tm</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_tm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_silent</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_echo</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;LINE: </span><span class="si">{}</span><span class="s1"> | </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">line2</span><span class="p">))</span>
 
 
@@ -251,6 +251,24 @@
         <span class="k">return</span></div>
 
 
+<span class="k">def</span> <span class="nf">_watch_and_send_greeting</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Listening to file(s): &quot;</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file_glob&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bind_address&#39;</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Broadcasting with ZeroMQ PUB at: &quot;</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bind_address&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;connect_addresses&#39;</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Transmitting with ZeroMQ PUSH to:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">address</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;connect_addresses&#39;</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - &quot;</span> <span class="o">+</span> <span class="n">address</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;all_lines&#39;</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading already existing content.&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tail_lines&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading </span><span class="si">{}</span><span class="s2"> trailing lines.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tail_lines&#39;</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config_file&#39;</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using YAML configuration.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;exec_actions&#39;</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Executing actions from configuration.&quot;</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="watch_and_send"><a class="viewcode-back" href="../../modules/core.html#logsweet.core.watch_and_send">[docs]</a><span class="k">def</span> <span class="nf">watch_and_send</span><span class="p">(</span><span class="n">file_glob</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                    <span class="n">bind_address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                    <span class="n">connect_addresses</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -260,7 +278,7 @@
                    <span class="n">tail_lines</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
                    <span class="n">encoding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span><span class="p">,</span>
-                   <span class="n">silent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+                   <span class="n">echo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Start following text files, sending new lines</span>
 <span class="sd">    via a ZeroMQ PUB and/or PUSH socket.</span>
@@ -301,26 +319,16 @@
 <span class="sd">        The name of this broadcaster.</span>
 <span class="sd">    :type name: str</span>
 
-<span class="sd">    :param silent:</span>
-<span class="sd">        If `False`, new lines are printed to the console.</span>
-<span class="sd">    :type silent: bool</span>
+<span class="sd">    :param echo:</span>
+<span class="sd">        If `True`, new lines are printed to the console.</span>
+<span class="sd">    :type echo: bool</span>
 
 <span class="sd">    :param encoding:</span>
 <span class="sd">        Specifies the encoding for reading the text files.</span>
 <span class="sd">        If `None` defaults to preferred encoding of current user.</span>
 <span class="sd">    :type encoding: Optional[str]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Listening to file(s): &quot;</span> <span class="o">+</span> <span class="n">file_glob</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">bind_address</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Broadcasting with ZeroMQ PUB at: &quot;</span> <span class="o">+</span> <span class="n">bind_address</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">connect_addresses</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Transmitting with ZeroMQ PUSH to:&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">address</span> <span class="ow">in</span> <span class="n">connect_addresses</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - &quot;</span> <span class="o">+</span> <span class="n">address</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">all_lines</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading already existing content.&quot;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">tail_lines</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading </span><span class="si">{}</span><span class="s2"> trailing lines.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tail_lines</span><span class="p">))</span>
+    <span class="n">_watch_and_send_greeting</span><span class="p">(</span><span class="o">**</span><span class="nb">locals</span><span class="p">())</span>
 
     <span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">exec_actions</span><span class="p">)</span> <span class="k">if</span> <span class="n">config_file</span> <span class="k">else</span> <span class="kc">None</span>
 
@@ -329,7 +337,7 @@
     <span class="n">transmitter</span> <span class="o">=</span> <span class="n">Transmitter</span><span class="p">(</span><span class="n">connect_addresses</span><span class="p">)</span> \
         <span class="k">if</span> <span class="n">connect_addresses</span> <span class="k">else</span> <span class="kc">None</span>
 
-    <span class="n">handler</span> <span class="o">=</span> <span class="n">LogWatcherHandler</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">silent</span><span class="p">,</span>
+    <span class="n">handler</span> <span class="o">=</span> <span class="n">LogWatcherHandler</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">echo</span><span class="p">,</span>
                                 <span class="n">bc</span><span class="o">=</span><span class="n">broadcaster</span><span class="p">,</span> <span class="n">tm</span><span class="o">=</span><span class="n">transmitter</span><span class="p">)</span>
     <span class="n">watcher</span> <span class="o">=</span> <span class="n">LogWatcher</span><span class="p">(</span><span class="n">file_glob</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span>
                          <span class="n">all_lines</span><span class="o">=</span><span class="n">all_lines</span><span class="p">,</span> <span class="n">tail_lines</span><span class="o">=</span><span class="n">tail_lines</span><span class="p">,</span>
@@ -400,24 +408,21 @@
     <span class="n">listener</span><span class="o">.</span><span class="n">listen</span><span class="p">()</span></div>
 
 
-<span class="k">def</span> <span class="nf">_proxy_greeting</span><span class="p">(</span>
-        <span class="n">backend_bind_address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">backend_connect_addresses</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">frontend_bind_address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">frontend_connect_addresses</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-
-    <span class="k">if</span> <span class="n">backend_bind_address</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Receiving with ZeroMQ PULL at: &quot;</span> <span class="o">+</span> <span class="n">backend_bind_address</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">backend_connect_addresses</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_proxy_greeting</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;backend_bind_address&#39;</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Receiving with ZeroMQ PULL at: &quot;</span> <span class="o">+</span>
+              <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;backend_bind_address&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;backend_connect_addresses&#39;</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Collecting with ZeroMQ SUB from:&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">address</span> <span class="ow">in</span> <span class="n">backend_connect_addresses</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">address</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;backend_connect_addresses&#39;</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - &quot;</span> <span class="o">+</span> <span class="n">address</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">frontend_bind_address</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Broadcasting with ZeroMQ PUB at: &quot;</span> <span class="o">+</span> <span class="n">frontend_bind_address</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">frontend_connect_addresses</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;frontend_bind_address&#39;</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Broadcasting with ZeroMQ PUB at: &quot;</span> <span class="o">+</span>
+              <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;frontend_bind_address&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;frontend_connect_addresses&#39;</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Transmitting with ZeroMQ PUSH to:&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">address</span> <span class="ow">in</span> <span class="n">frontend_connect_addresses</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">address</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;frontend_connect_addresses&#39;</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - &quot;</span> <span class="o">+</span> <span class="n">address</span><span class="p">)</span>
 
 
@@ -452,9 +457,7 @@
 <span class="sd">        before handling possible interruption.</span>
 <span class="sd">    :type interval: float</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">_proxy_greeting</span><span class="p">(</span><span class="n">backend_bind_address</span><span class="p">,</span> <span class="n">backend_connect_addresses</span><span class="p">,</span>
-                    <span class="n">frontend_bind_address</span><span class="p">,</span> <span class="n">frontend_connect_addresses</span><span class="p">)</span>
+    <span class="n">_proxy_greeting</span><span class="p">(</span><span class="o">**</span><span class="nb">locals</span><span class="p">())</span>
 
     <span class="n">broadcaster</span> <span class="o">=</span> <span class="n">Broadcaster</span><span class="p">(</span><span class="n">frontend_bind_address</span><span class="p">)</span> \
         <span class="k">if</span> <span class="n">frontend_bind_address</span> <span class="k">else</span> <span class="kc">None</span>
