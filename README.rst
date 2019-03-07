@@ -158,7 +158,7 @@ Here is an example:
 
    # The exclude statement is an array of regular expressions or a single one.
    # A log message is dropped if it matches any of the expressions.
-   exclude: 'black'
+   exclude: 'ignore\s+this'
 
    # The colors statement is an array of colorization rules.
    # The rules are tried in the given order until one matches.
