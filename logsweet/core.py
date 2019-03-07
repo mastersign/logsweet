@@ -19,12 +19,12 @@ class LogWatcherHandler(object):
 
     def __init__(self, name: str,
                  config: Optional[Configuration],
-                 silent: bool,
+                 echo: bool,
                  bc: Optional[Broadcaster] = None,
                  tm: Optional[Transmitter] = None):
         self._name = name
         self._cfg = config
-        self._silent = silent
+        self._echo = echo
         self._bc = bc
         self._tm = tm
 
@@ -34,7 +34,7 @@ class LogWatcherHandler(object):
             self._bc.send(topic, '')
         if self._tm:
             self._tm.send(topic, '')
-        if not self._silent:
+        if self._echo:
             print('START WATCHING: ' + file_name)
 
     def notify_unwatch(self, file_name):
@@ -43,7 +43,7 @@ class LogWatcherHandler(object):
             self._bc.send(topic, '')
         if self._tm:
             self._tm.send(topic, '')
-        if not self._silent:
+        if self._echo:
             print('STOP WATCHING: ' + file_name)
 
     def notify_lines(self, file_name, lines):
@@ -56,7 +56,7 @@ class LogWatcherHandler(object):
                 self._bc.send(topic, line)
             if self._tm:
                 self._tm.send(topic, line)
-            if not self._silent:
+            if self._echo:
                 print('LINE: {} | {}'.format(file_name, line2))
 
 
@@ -104,7 +104,7 @@ def watch_and_send(file_glob: str,
                    tail_lines: int = 0,
                    encoding: Optional[str] = None,
                    name: str = 'unknown',
-                   silent: bool = False):
+                   echo: bool = False):
     """
     Start following text files, sending new lines
     via a ZeroMQ PUB and/or PUSH socket.
@@ -145,9 +145,9 @@ def watch_and_send(file_glob: str,
         The name of this broadcaster.
     :type name: str
 
-    :param silent:
-        If `False`, new lines are printed to the console.
-    :type silent: bool
+    :param echo:
+        If `True`, new lines are printed to the console.
+    :type echo: bool
 
     :param encoding:
         Specifies the encoding for reading the text files.
@@ -173,7 +173,7 @@ def watch_and_send(file_glob: str,
     transmitter = Transmitter(connect_addresses) \
         if connect_addresses else None
 
-    handler = LogWatcherHandler(name, config, silent,
+    handler = LogWatcherHandler(name, config, echo,
                                 bc=broadcaster, tm=transmitter)
     watcher = LogWatcher(file_glob, handler,
                          all_lines=all_lines, tail_lines=tail_lines,

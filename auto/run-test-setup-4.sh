@@ -15,10 +15,10 @@ xterm -title "Log Listen B" -geometry 200x20 -e bash -c \
     "cd \"$pdir\" && pipenv run python3 -m logsweet.cli listen -c 127.0.0.1:9507" &
 
 xterm -title "Log Watch A" -geometry 120x10 -e bash -c \
-    "cd \"$pdir\" && pipenv run python3 -m logsweet.cli watch -s -c 127.0.0.1:9506 \"$this_dir/test-4-a-*.log\"" &
+    "cd \"$pdir\" && pipenv run python3 -m logsweet.cli watch -c 127.0.0.1:9506 \"$this_dir/test-4-a-*.log\"" &
 
 xterm -title "Log Watch B" -geometry 120x10 -e bash -c \
-    "cd \"$pdir\" && pipenv run python3 -m logsweet.cli watch -s -c 127.0.0.1:9506 \"$this_dir/test-4-b-*.log\"" &
+    "cd \"$pdir\" && pipenv run python3 -m logsweet.cli watch -c 127.0.0.1:9506 \"$this_dir/test-4-b-*.log\"" &
 
 log_files="\"$this_dir/test-4-a-1.log\" \"$this_dir/test-4-a-2.log\" \"$this_dir/test-4-b-1.log\" \"$this_dir/test-4-b-2.log\""
 xterm -title "Log Mock" -geometry 120x10 -e bash -c \

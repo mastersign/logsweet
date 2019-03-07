@@ -12,9 +12,9 @@ START "Log Listen B" /D "%~dp0.." pipenv run python -m logsweet.cli ^
     listen -b 127.0.0.1:9511
 
 START "Log Watch A" /D "%~dp0.." pipenv run python -m logsweet.cli ^
-    watch -s -b 127.0.0.1:9508 "%~dp0test-5-a-*.log"
+    watch -b 127.0.0.1:9508 "%~dp0test-5-a-*.log"
 START "Log Watch B" /D "%~dp0.." pipenv run python -m logsweet.cli ^
-    watch -s -b 127.0.0.1:9509 "%~dp0test-5-b-*.log"
+    watch -b 127.0.0.1:9509 "%~dp0test-5-b-*.log"
 
 START "Log Mock" /D "%~dp0.." pipenv run python -m logsweet.cli ^
     mock -i 0.001 ^

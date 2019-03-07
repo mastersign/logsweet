@@ -45,15 +45,15 @@ def mock(logfiles, interval, max_lines):
               help='Number of tail lines to broadcast before following.')
 @click.option('-e', '--encoding', type=str, default=None,
               help='Encoding for reading the text files.')
-@click.option('-s', '--silent', is_flag=True,
-              help='Do not print new lines to the console.')
 @click.option('-n', '--name', type=str, default=None,
               help='The source name for the watched logs.')
+@click.option('--echo', is_flag=True,
+              help='Print events to the console.')
 @click.argument('file-glob')
 def watch(file_glob, bind_address, connect_address,
           config_file, exec_actions,
           all_lines, tail_lines, encoding,
-          name, silent):
+          name, echo):
     if bind_address is None and not connect_address:
         bind_address = '127.0.0.1:9000'
     watch_and_send(file_glob,
@@ -65,7 +65,7 @@ def watch(file_glob, bind_address, connect_address,
                    tail_lines=tail_lines,
                    encoding=encoding,
                    name=name or socket.gethostname(),
-                   silent=silent)
+                   echo=echo)
 
 
 @main.command(help='Listen to text lines with ZeroMQ SUB and/or PULL socket.')
