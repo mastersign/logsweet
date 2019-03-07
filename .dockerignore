@@ -11,6 +11,6 @@ __pycache__/
 dev-requirements.txt
 README.*
 CHANGELOG.*
-LICENSE.*
+LICENSE
 Pipfile
 Pipfile.lock
