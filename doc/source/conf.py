@@ -17,14 +17,15 @@ sys.path.insert(0, os.path.abspath(os.path.join('..', '..')))
 
 # -- Project information -----------------------------------------------------
 
+import logsweet as root  # noqa E402
 project = 'logsweet'
 copyright = '2019, Tobias Kiertscher'
 author = 'Tobias Kiertscher'
 
 # The short X.Y version
-version = '0.0'
+version = '.'.join(root.__version__.split('.')[:2])
 # The full version, including alpha/beta/rc tags
-release = '0.0.0-dev'
+release = root.__version__
 
 
 # -- General configuration ---------------------------------------------------
