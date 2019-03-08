@@ -84,15 +84,20 @@ def write_logfiles(logfiles: Sequence[str],
 
     n = 0
     try:
+        fhs = [open(f, 'a', encoding='UTF-8') for f in logfiles]
         while True:
-            with open(choice(logfiles), 'a', encoding='UTF-8') as f:
-                f.write(random_log_message(n) + '\n')
+            f = choice(fhs)
+            f.write(random_log_message(n) + '\n')
+            f.flush()
             n += 1
             if is_stopped() or (max_n is not None and n >= max_n):
                 break
             sleep(interval)
     except KeyboardInterrupt:
         return
+    finally:
+        for fh in fhs:
+            fh.close()
 
 
 def _watch_and_send_greeting(**kwargs):
