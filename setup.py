@@ -46,8 +46,7 @@ setup(
     long_description=long_description,
     keywords=' '.join(logsweet.__keywords__),
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: Users',
+        'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
         'Operating System :: OS Independent',
